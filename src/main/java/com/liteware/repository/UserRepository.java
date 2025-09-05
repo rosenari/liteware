@@ -59,4 +59,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByIdWithDepartmentAndPosition(@Param("userId") Long userId);
     
     List<User> findByNameContainingOrLoginIdContainingOrEmailContaining(String name, String loginId, String email);
+    
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.department LEFT JOIN FETCH u.position")
+    List<User> findAllWithDepartmentAndPosition();
 }

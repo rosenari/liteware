@@ -28,8 +28,9 @@ public class UserService {
     /**
      * 모든 사용자 조회
      */
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findAllWithDepartmentAndPosition();
     }
     
     /**
