@@ -1,7 +1,136 @@
+# IDE
 .idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.project
+.classpath
 .claude/
 
 # Gradle
-gradle-*/
-gradle.zip
-build/libs/*.jar
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+gradle-app.setting
+.gradletasknamecache
+
+# Spring Boot
+application-local.yml
+application-local.properties
+application-*.yml
+!application-test.yml
+!application-docker.yml
+
+# Compiled class files
+*.class
+bin/
+out/
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+!gradle/wrapper/gradle-wrapper.jar
+
+# Logs
+logs/
+*.log
+*.log.gz
+*.log.*
+
+# Database
+*.db
+*.sqlite
+*.h2.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Test Coverage
+jacoco.exec
+.nyc_output/
+coverage/
+*.lcov
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker volumes
+mysql_data/
+redis_data/
+app_logs/
+app_uploads/
+
+# Upload directory
+uploads/
+upload/
+files/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Maven (in case of migration)
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Node (if frontend is added later)
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (for scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Secret files
+*.pem
+*.key
+*.crt
+*.p12
+secret.yml
+secrets.yml
+secrets.properties

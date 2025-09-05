@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: liteware-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass123!
+      MYSQL_DATABASE: liteware
+      MYSQL_USER: liteware
+      MYSQL_PASSWORD: liteware123!
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    command: 
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - liteware-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: liteware-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 10
+    networks:
+      - liteware-network
+
+  app:
+    build: .
+    container_name: liteware-app
+    restart: always
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/liteware?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: liteware
+      SPRING_DATASOURCE_PASSWORD: liteware123!
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-ThisIsAVerySecretKeyForJWTTokenGenerationAndItShouldBeAtLeast256Bits}
+      SERVER_PORT: 8080
+      TZ: Asia/Seoul
+    ports:
+      - "8080:8080"
+    volumes:
+      - app_logs:/app/logs
+      - app_uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - liteware-network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  app_logs:
+    driver: local
+  app_uploads:
+    driver: local
+
+networks:
+  liteware-network:
+    driver: bridge
