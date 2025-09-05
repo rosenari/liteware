@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>대시보드 | Liteware</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{layout/base :: content-header(pageTitle='대시보드')}"></div>
+    
+    <!-- 상단 요약 카드 -->
+    <div class="row">
+        <!-- 결재 대기 -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-info">
+                <div class="inner">
+                    <h3 th:text="${pendingApprovals != null ? pendingApprovals : 0}">0</h3>
+                    <p>결재 대기</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+                <a href="/approval?type=pending" class="small-box-footer">
+                    자세히 보기 <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 기안 문서 -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-success">
+                <div class="inner">
+                    <h3 th:text="${draftedDocuments != null ? draftedDocuments : 0}">0</h3>
+                    <p>진행중인 기안</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <a href="/approval?type=drafted" class="small-box-footer">
+                    자세히 보기 <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 새 게시글 -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-warning">
+                <div class="inner">
+                    <h3>12</h3>
+                    <p>새 게시글</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+                <a href="/board" class="small-box-footer">
+                    자세히 보기 <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- 오늘의 일정 -->
+        <div class="col-lg-3 col-6">
+            <div class="small-box bg-danger">
+                <div class="inner">
+                    <h3>3</h3>
+                    <p>오늘의 일정</p>
+                </div>
+                <div class="icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <a href="/calendar" class="small-box-footer">
+                    자세히 보기 <i class="fas fa-arrow-circle-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- 최근 결재 문서 -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-file-signature mr-1"></i>
+                        최근 결재 문서
+                    </h3>
+                    <div class="card-tools">
+                        <a href="/approval" class="btn btn-tool btn-sm">
+                            <i class="fas fa-plus"></i> 더보기
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>문서명</th>
+                                <th>기안자</th>
+                                <th style="width: 80px">상태</th>
+                                <th style="width: 100px">작성일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1.</td>
+                                <td>휴가신청서 - 연차휴가</td>
+                                <td>김철수</td>
+                                <td><span class="badge badge-pending">대기</span></td>
+                                <td>2025.01.05</td>
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td>출장보고서 - 서울지사</td>
+                                <td>이영희</td>
+                                <td><span class="badge badge-approved">승인</span></td>
+                                <td>2025.01.04</td>
+                            </tr>
+                            <tr>
+                                <td>3.</td>
+                                <td>경비청구서 - 회식비</td>
+                                <td>박민수</td>
+                                <td><span class="badge badge-pending">대기</span></td>
+                                <td>2025.01.04</td>
+                            </tr>
+                            <tr>
+                                <td>4.</td>
+                                <td>구매요청서 - 사무용품</td>
+                                <td>정수진</td>
+                                <td><span class="badge badge-rejected">반려</span></td>
+                                <td>2025.01.03</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 공지사항 -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-bullhorn mr-1"></i>
+                        공지사항
+                    </h3>
+                    <div class="card-tools">
+                        <a href="/board/1" class="btn btn-tool btn-sm">
+                            <i class="fas fa-plus"></i> 더보기
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th style="width: 10px">#</th>
+                                <th>제목</th>
+                                <th>작성자</th>
+                                <th style="width: 100px">작성일</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>📌</td>
+                                <td>2025년 신년사</td>
+                                <td>대표이사</td>
+                                <td>2025.01.02</td>
+                            </tr>
+                            <tr>
+                                <td>1.</td>
+                                <td>1월 정기 시스템 점검 안내</td>
+                                <td>IT팀</td>
+                                <td>2025.01.05</td>
+                            </tr>
+                            <tr>
+                                <td>2.</td>
+                                <td>2025년 상반기 교육 일정</td>
+                                <td>인사팀</td>
+                                <td>2025.01.04</td>
+                            </tr>
+                            <tr>
+                                <td>3.</td>
+                                <td>사내 카페테리아 운영 시간 변경</td>
+                                <td>총무팀</td>
+                                <td>2025.01.03</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- 근태 현황 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-user-clock mr-1"></i>
+                        나의 근태 현황
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="info-box bg-light">
+                                <span class="info-box-icon bg-success"><i class="fas fa-sign-in-alt"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">출근 시간</span>
+                                    <span class="info-box-number">08:52</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="description-block border-right">
+                                <h5 class="description-header">15일</h5>
+                                <span class="description-text">잔여 연차</span>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="description-block">
+                                <h5 class="description-header">2일</h5>
+                                <span class="description-text">이번달 사용</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <a href="/attendance" class="btn btn-sm btn-primary btn-block">근태 관리 바로가기</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 빠른 메뉴 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-rocket mr-1"></i>
+                        빠른 메뉴
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6 mb-2">
+                            <a href="/approval/draft" class="btn btn-app bg-info w-100">
+                                <i class="fas fa-edit"></i> 기안 작성
+                            </a>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <a href="/board/2/write" class="btn btn-app bg-success w-100">
+                                <i class="fas fa-pen"></i> 게시글 작성
+                            </a>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <a href="/organization" class="btn btn-app bg-warning w-100">
+                                <i class="fas fa-sitemap"></i> 조직도
+                            </a>
+                        </div>
+                        <div class="col-6 mb-2">
+                            <a href="/calendar" class="btn btn-app bg-danger w-100">
+                                <i class="fas fa-calendar"></i> 일정 관리
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 부서 소식 -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-users mr-1"></i>
+                        우리 부서 소식
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="direct-chat-messages" style="height: 250px;">
+                        <div class="direct-chat-msg">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-left">김과장</span>
+                                <span class="direct-chat-timestamp float-right">오늘 09:30</span>
+                            </div>
+                            <img class="direct-chat-img" src="https://via.placeholder.com/40" alt="User">
+                            <div class="direct-chat-text">
+                                오늘 오후 3시 팀 미팅 있습니다!
+                            </div>
+                        </div>
+                        <div class="direct-chat-msg right">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name float-right">이대리</span>
+                                <span class="direct-chat-timestamp float-left">오늘 10:15</span>
+                            </div>
+                            <img class="direct-chat-img" src="https://via.placeholder.com/40" alt="User">
+                            <div class="direct-chat-text">
+                                프로젝트 진행 상황 공유드립니다.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 차트 영역 -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-bar mr-1"></i>
+                        월별 결재 현황
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="approvalChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-chart-pie mr-1"></i>
+                        문서 유형별 통계
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="documentTypeChart" style="height: 300px;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// 월별 결재 현황 차트
+const approvalCtx = document.getElementById('approvalChart').getContext('2d');
+new Chart(approvalCtx, {
+    type: 'bar',
+    data: {
+        labels: ['7월', '8월', '9월', '10월', '11월', '12월'],
+        datasets: [{
+            label: '승인',
+            data: [12, 19, 15, 25, 22, 30],
+            backgroundColor: 'rgba(40, 167, 69, 0.8)'
+        }, {
+            label: '반려',
+            data: [3, 2, 5, 3, 4, 2],
+            backgroundColor: 'rgba(220, 53, 69, 0.8)'
+        }, {
+            label: '대기',
+            data: [5, 8, 4, 7, 6, 9],
+            backgroundColor: 'rgba(255, 193, 7, 0.8)'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// 문서 유형별 통계 차트
+const docTypeCtx = document.getElementById('documentTypeChart').getContext('2d');
+new Chart(docTypeCtx, {
+    type: 'doughnut',
+    data: {
+        labels: ['휴가신청', '경비청구', '구매요청', '출장신청', '기타'],
+        datasets: [{
+            data: [30, 25, 20, 15, 10],
+            backgroundColor: [
+                'rgba(54, 162, 235, 0.8)',
+                'rgba(255, 99, 132, 0.8)',
+                'rgba(255, 206, 86, 0.8)',
+                'rgba(75, 192, 192, 0.8)',
+                'rgba(153, 102, 255, 0.8)'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false
+    }
+});
+</script>
+</th:block>
+</body>
+</html>

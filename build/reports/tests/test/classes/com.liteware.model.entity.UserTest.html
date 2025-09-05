@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - UserTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>UserTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.liteware.model.entity.html">com.liteware.model.entity</a> &gt; UserTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">8</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.617s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Method name</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">User 상태를 변경할 수 있어야 한다</td>
+<td class="success">changeUserStatus()</td>
+<td class="success">0.007s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">User 엔티티가 정상적으로 생성되어야 한다</td>
+<td class="success">createUser()</td>
+<td class="success">0.004s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">User 엔티티가 데이터베이스에 저장되어야 한다</td>
+<td class="success">saveUser()</td>
+<td class="success">0.418s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">User 엔티티 업데이트 시 updatedAt이 변경되어야 한다</td>
+<td class="success">updateUser()</td>
+<td class="success">0.118s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">User와 Department가 연관관계를 가져야 한다</td>
+<td class="success">userDepartmentRelationship()</td>
+<td class="success">0.012s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">User와 Position이 연관관계를 가져야 한다</td>
+<td class="success">userPositionRelationship()</td>
+<td class="success">0.035s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">이메일 형식이 올바르지 않으면 검증에 실패해야 한다</td>
+<td class="success">validateEmailFormat()</td>
+<td class="success">0.007s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">필수 필드가 없으면 검증에 실패해야 한다</td>
+<td class="success">validateRequiredFields()</td>
+<td class="success">0.016s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>18:03:31.539 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.liteware.model.entity.UserTest]: UserTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+18:03:31.607 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.liteware.LitewareApplication for test class com.liteware.model.entity.UserTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.0)
+
+2025-09-05 18:03:31 - Starting UserTest using Java 17.0.16 with PID 86007 (started by soon in /Users/soon/liteware)
+2025-09-05 18:03:31 - Running with Spring Boot v3.2.0, Spring v6.1.1
+2025-09-05 18:03:31 - The following 1 profile is active: &quot;test&quot;
+2025-09-05 18:03:32 - HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2025-09-05 18:03:33 - 
+    drop table if exists approval_attachments cascade 
+Hibernate: 
+    drop table if exists approval_attachments cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists approval_documents cascade 
+Hibernate: 
+    drop table if exists approval_documents cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists approval_lines cascade 
+Hibernate: 
+    drop table if exists approval_lines cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists boards cascade 
+Hibernate: 
+    drop table if exists boards cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists comments cascade 
+Hibernate: 
+    drop table if exists comments cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists departments cascade 
+Hibernate: 
+    drop table if exists departments cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists expense_items cascade 
+Hibernate: 
+    drop table if exists expense_items cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists expense_requests cascade 
+Hibernate: 
+    drop table if exists expense_requests cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists file_attachments cascade 
+Hibernate: 
+    drop table if exists file_attachments cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists leave_requests cascade 
+Hibernate: 
+    drop table if exists leave_requests cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists notifications cascade 
+Hibernate: 
+    drop table if exists notifications cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists overtime_requests cascade 
+Hibernate: 
+    drop table if exists overtime_requests cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists positions cascade 
+Hibernate: 
+    drop table if exists positions cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists post_attachments cascade 
+Hibernate: 
+    drop table if exists post_attachments cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists posts cascade 
+Hibernate: 
+    drop table if exists posts cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists roles cascade 
+Hibernate: 
+    drop table if exists roles cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists user_roles cascade 
+Hibernate: 
+    drop table if exists user_roles cascade 
+2025-09-05 18:03:33 - 
+    drop table if exists users cascade 
+Hibernate: 
+    drop table if exists users cascade 
+2025-09-05 18:03:33 - 
+    create table approval_attachments (
+        attachment_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        doc_id bigint not null,
+        file_size bigint,
+        updated_at timestamp(6) not null,
+        uploaded_by bigint not null,
+        mime_type varchar(100),
+        file_name varchar(255) not null,
+        file_path varchar(255) not null,
+        original_file_name varchar(255) not null,
+        primary key (attachment_id)
+    )
+Hibernate: 
+    create table approval_attachments (
+        attachment_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        doc_id bigint not null,
+        file_size bigint,
+        updated_at timestamp(6) not null,
+        uploaded_by bigint not null,
+        mime_type varchar(100),
+        file_name varchar(255) not null,
+        file_path varchar(255) not null,
+        original_file_name varchar(255) not null,
+        primary key (attachment_id)
+    )
+2025-09-05 18:03:33 - 
+    create table approval_documents (
+        is_deleted boolean,
+        completed_at timestamp(6),
+        created_at timestamp(6) not null,
+        current_approver_id bigint,
+        doc_id bigint generated by default as identity,
+        drafted_at timestamp(6),
+        drafter_id bigint not null,
+        updated_at timestamp(6) not null,
+        status varchar(20) not null check (status in ('DRAFT','PENDING','APPROVED','REJECTED','CANCELLED')),
+        urgency varchar(20) not null check (urgency in ('NORMAL','URGENT')),
+        doc_number varchar(30) not null unique,
+        doc_type varchar(30) not null check (doc_type in ('LEAVE_REQUEST','OVERTIME_REQUEST','EXPENSE_REQUEST','PURCHASE_REQUEST','GENERAL_APPROVAL','BUSINESS_TRIP','WORK_FROM_HOME','RESIGNATION')),
+        title varchar(200) not null,
+        content TEXT,
+        form_data TEXT,
+        primary key (doc_id)
+    )
+Hibernate: 
+    create table approval_documents (
+        is_deleted boolean,
+        completed_at timestamp(6),
+        created_at timestamp(6) not null,
+        current_approver_id bigint,
+        doc_id bigint generated by default as identity,
+        drafted_at timestamp(6),
+        drafter_id bigint not null,
+        updated_at timestamp(6) not null,
+        status varchar(20) not null check (status in ('DRAFT','PENDING','APPROVED','REJECTED','CANCELLED')),
+        urgency varchar(20) not null check (urgency in ('NORMAL','URGENT')),
+        doc_number varchar(30) not null unique,
+        doc_type varchar(30) not null check (doc_type in ('LEAVE_REQUEST','OVERTIME_REQUEST','EXPENSE_REQUEST','PURCHASE_REQUEST','GENERAL_APPROVAL','BUSINESS_TRIP','WORK_FROM_HOME','RESIGNATION')),
+        title varchar(200) not null,
+        content TEXT,
+        form_data TEXT,
+        primary key (doc_id)
+    )
+2025-09-05 18:03:33 - 
+    create table approval_lines (
+        is_optional boolean,
+        order_seq integer not null,
+        approved_at timestamp(6),
+        approver_id bigint not null,
+        created_at timestamp(6) not null,
+        delegated_at timestamp(6),
+        delegated_to bigint,
+        doc_id bigint not null,
+        line_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        approval_type varchar(20) not null check (approval_type in ('APPROVAL','AGREEMENT','REFERENCE','NOTIFICATION')),
+        status varchar(20) not null check (status in ('PENDING','APPROVED','REJECTED','SKIPPED')),
+        comment TEXT,
+        primary key (line_id)
+    )
+Hibernate: 
+    create table approval_lines (
+        is_optional boolean,
+        order_seq integer not null,
+        approved_at timestamp(6),
+        approver_id bigint not null,
+        created_at timestamp(6) not null,
+        delegated_at timestamp(6),
+        delegated_to bigint,
+        doc_id bigint not null,
+        line_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        approval_type varchar(20) not null check (approval_type in ('APPROVAL','AGREEMENT','REFERENCE','NOTIFICATION')),
+        status varchar(20) not null check (status in ('PENDING','APPROVED','REJECTED','SKIPPED')),
+        comment TEXT,
+        primary key (line_id)
+    )
+2025-09-05 18:03:33 - 
+    create table boards (
+        attachment_yn boolean,
+        comment_auth_level integer,
+        notice_yn boolean,
+        read_auth_level integer,
+        secret_yn boolean,
+        sort_order integer,
+        use_yn boolean not null,
+        write_auth_level integer,
+        board_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        updated_at timestamp(6) not null,
+        board_type varchar(20) not null check (board_type in ('NOTICE','GENERAL','QNA','FAQ','DATA')),
+        board_code varchar(50) not null unique,
+        board_name varchar(100) not null,
+        description varchar(500),
+        primary key (board_id)
+    )
+Hibernate: 
+    create table boards (
+        attachment_yn boolean,
+        comment_auth_level integer,
+        notice_yn boolean,
+        read_auth_level integer,
+        secret_yn boolean,
+        sort_order integer,
+        use_yn boolean not null,
+        write_auth_level integer,
+        board_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        updated_at timestamp(6) not null,
+        board_type varchar(20) not null check (board_type in ('NOTICE','GENERAL','QNA','FAQ','DATA')),
+        board_code varchar(50) not null unique,
+        board_name varchar(100) not null,
+        description varchar(500),
+        primary key (board_id)
+    )
+2025-09-05 18:03:33 - 
+    create table comments (
+        depth integer,
+        is_deleted boolean,
+        like_count integer,
+        comment_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        parent_comment_id bigint,
+        post_id bigint not null,
+        updated_at timestamp(6) not null,
+        writer_id bigint not null,
+        content varchar(1000) not null,
+        primary key (comment_id)
+    )
+Hibernate: 
+    create table comments (
+        depth integer,
+        is_deleted boolean,
+        like_count integer,
+        comment_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        parent_comment_id bigint,
+        post_id bigint not null,
+        updated_at timestamp(6) not null,
+        writer_id bigint not null,
+        content varchar(1000) not null,
+        primary key (comment_id)
+    )
+2025-09-05 18:03:33 - 
+    create table departments (
+        dept_level integer,
+        is_active boolean not null,
+        sort_order integer,
+        created_at timestamp(6) not null,
+        dept_id bigint generated by default as identity,
+        manager_id bigint,
+        parent_dept_id bigint,
+        updated_at timestamp(6) not null,
+        dept_code varchar(20) not null unique,
+        dept_name varchar(100) not null,
+        description varchar(255),
+        primary key (dept_id)
+    )
+Hibernate: 
+    create table departments (
+        dept_level integer,
+        is_active boolean not null,
+        sort_order integer,
+        created_at timestamp(6) not null,
+        dept_id bigint generated by default as identity,
+        manager_id bigint,
+        parent_dept_id bigint,
+        updated_at timestamp(6) not null,
+        dept_code varchar(20) not null unique,
+        dept_name varchar(100) not null,
+        description varchar(255),
+        primary key (dept_id)
+    )
+2025-09-05 18:03:33 - 
+    create table expense_items (
+        amount numeric(10,2) not null,
+        expense_date date not null,
+        expense_request_id bigint,
+        item_id bigint generated by default as identity,
+        description varchar(255) not null,
+        payment_method varchar(255) check (payment_method in ('CASH','CORPORATE_CARD','PERSONAL_CARD','BANK_TRANSFER')),
+        receipt_number varchar(255),
+        remarks TEXT,
+        vendor varchar(255),
+        primary key (item_id)
+    )
+Hibernate: 
+    create table expense_items (
+        amount numeric(10,2) not null,
+        expense_date date not null,
+        expense_request_id bigint,
+        item_id bigint generated by default as identity,
+        description varchar(255) not null,
+        payment_method varchar(255) check (payment_method in ('CASH','CORPORATE_CARD','PERSONAL_CARD','BANK_TRANSFER')),
+        receipt_number varchar(255),
+        remarks TEXT,
+        vendor varchar(255),
+        primary key (item_id)
+    )
+2025-09-05 18:03:33 - 
+    create table expense_requests (
+        paid_date date,
+        total_amount numeric(12,2) not null,
+        doc_id bigint not null unique,
+        expense_request_id bigint generated by default as identity,
+        account_holder varchar(255),
+        account_number varchar(255),
+        bank_name varchar(255),
+        category varchar(255) check (category in ('BUSINESS_TRIP','ENTERTAINMENT','OFFICE_SUPPLIES','EDUCATION','TRANSPORTATION','MEAL','COMMUNICATION','OTHER')),
+        customer_name varchar(255),
+        payment_status varchar(255) check (payment_status in ('PENDING','PAID','REJECTED')),
+        project_code varchar(255),
+        project_name varchar(255),
+        purpose TEXT,
+        primary key (expense_request_id)
+    )
+Hibernate: 
+    create table expense_requests (
+        paid_date date,
+        total_amount numeric(12,2) not null,
+        doc_id bigint not null unique,
+        expense_request_id bigint generated by default as identity,
+        account_holder varchar(255),
+        account_number varchar(255),
+        bank_name varchar(255),
+        category varchar(255) check (category in ('BUSINESS_TRIP','ENTERTAINMENT','OFFICE_SUPPLIES','EDUCATION','TRANSPORTATION','MEAL','COMMUNICATION','OTHER')),
+        customer_name varchar(255),
+        payment_status varchar(255) check (payment_status in ('PENDING','PAID','REJECTED')),
+        project_code varchar(255),
+        project_name varchar(255),
+        purpose TEXT,
+        primary key (expense_request_id)
+    )
+2025-09-05 18:03:33 - 
+    create table file_attachments (
+        download_count bigint,
+        entity_id bigint not null,
+        file_id bigint generated by default as identity,
+        file_size bigint not null,
+        uploaded_at timestamp(6),
+        uploader_id bigint,
+        entity_type varchar(255) not null,
+        file_name varchar(255) not null,
+        file_path varchar(255) not null,
+        file_type varchar(255),
+        stored_name varchar(255) not null,
+        primary key (file_id)
+    )
+Hibernate: 
+    create table file_attachments (
+        download_count bigint,
+        entity_id bigint not null,
+        file_id bigint generated by default as identity,
+        file_size bigint not null,
+        uploaded_at timestamp(6),
+        uploader_id bigint,
+        entity_type varchar(255) not null,
+        file_name varchar(255) not null,
+        file_path varchar(255) not null,
+        file_type varchar(255),
+        stored_name varchar(255) not null,
+        primary key (file_id)
+    )
+2025-09-05 18:03:33 - 
+    create table leave_requests (
+        end_date date not null,
+        leave_days integer,
+        start_date date not null,
+        doc_id bigint not null unique,
+        leave_request_id bigint generated by default as identity,
+        emergency_contact varchar(255),
+        handover_details TEXT,
+        handover_to varchar(255),
+        leave_type varchar(255) not null check (leave_type in ('ANNUAL','SICK','SPECIAL','MATERNITY','PATERNITY','CHILDCARE','OTHER')),
+        reason varchar(255),
+        primary key (leave_request_id)
+    )
+Hibernate: 
+    create table leave_requests (
+        end_date date not null,
+        leave_days integer,
+        start_date date not null,
+        doc_id bigint not null unique,
+        leave_request_id bigint generated by default as identity,
+        emergency_contact varchar(255),
+        handover_details TEXT,
+        handover_to varchar(255),
+        leave_type varchar(255) not null check (leave_type in ('ANNUAL','SICK','SPECIAL','MATERNITY','PATERNITY','CHILDCARE','OTHER')),
+        reason varchar(255),
+        primary key (leave_request_id)
+    )
+2025-09-05 18:03:33 - 
+    create table notifications (
+        is_deleted boolean,
+        is_read boolean,
+        created_at timestamp(6),
+        expired_at timestamp(6),
+        notification_id bigint generated by default as identity,
+        read_at timestamp(6),
+        related_entity_id bigint,
+        user_id bigint not null,
+        action_url varchar(255),
+        message TEXT,
+        priority varchar(255) check (priority in ('LOW','NORMAL','HIGH','URGENT')),
+        related_entity_type varchar(255),
+        title varchar(255) not null,
+        type varchar(255) not null check (type in ('APPROVAL_REQUEST','APPROVAL_APPROVED','APPROVAL_REJECTED','APPROVAL_COMPLETED','BOARD_COMMENT','BOARD_MENTION','SCHEDULE_REMINDER','SYSTEM_NOTICE','USER_MESSAGE')),
+        primary key (notification_id)
+    )
+Hibernate: 
+    create table notifications (
+        is_deleted boolean,
+        is_read boolean,
+        created_at timestamp(6),
+        expired_at timestamp(6),
+        notification_id bigint generated by default as identity,
+        read_at timestamp(6),
+        related_entity_id bigint,
+        user_id bigint not null,
+        action_url varchar(255),
+        message TEXT,
+        priority varchar(255) check (priority in ('LOW','NORMAL','HIGH','URGENT')),
+        related_entity_type varchar(255),
+        title varchar(255) not null,
+        type varchar(255) not null check (type in ('APPROVAL_REQUEST','APPROVAL_APPROVED','APPROVAL_REJECTED','APPROVAL_COMPLETED','BOARD_COMMENT','BOARD_MENTION','SCHEDULE_REMINDER','SYSTEM_NOTICE','USER_MESSAGE')),
+        primary key (notification_id)
+    )
+2025-09-05 18:03:33 - 
+    create table overtime_requests (
+        end_time time(6) not null,
+        overtime_date date not null,
+        overtime_hours float(53),
+        start_time time(6) not null,
+        doc_id bigint not null unique,
+        overtime_request_id bigint generated by default as identity,
+        approver_comment varchar(255),
+        compensation_type varchar(255) check (compensation_type in ('PAYMENT','COMPENSATORY_LEAVE','BOTH')),
+        overtime_type varchar(255) check (overtime_type in ('WEEKDAY','WEEKEND','HOLIDAY','NIGHT')),
+        reason varchar(255) not null,
+        work_details TEXT,
+        primary key (overtime_request_id)
+    )
+Hibernate: 
+    create table overtime_requests (
+        end_time time(6) not null,
+        overtime_date date not null,
+        overtime_hours float(53),
+        start_time time(6) not null,
+        doc_id bigint not null unique,
+        overtime_request_id bigint generated by default as identity,
+        approver_comment varchar(255),
+        compensation_type varchar(255) check (compensation_type in ('PAYMENT','COMPENSATORY_LEAVE','BOTH')),
+        overtime_type varchar(255) check (overtime_type in ('WEEKDAY','WEEKEND','HOLIDAY','NIGHT')),
+        reason varchar(255) not null,
+        work_details TEXT,
+        primary key (overtime_request_id)
+    )
+2025-09-05 18:03:33 - 
+    create table positions (
+        is_active boolean not null,
+        position_level integer not null,
+        sort_order integer,
+        created_at timestamp(6) not null,
+        position_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        position_code varchar(20) not null unique,
+        position_name varchar(50) not null,
+        description varchar(255),
+        primary key (position_id)
+    )
+Hibernate: 
+    create table positions (
+        is_active boolean not null,
+        position_level integer not null,
+        sort_order integer,
+        created_at timestamp(6) not null,
+        position_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        position_code varchar(20) not null unique,
+        position_name varchar(50) not null,
+        description varchar(255),
+        primary key (position_id)
+    )
+2025-09-05 18:03:33 - 
+    create table post_attachments (
+        download_count integer,
+        attachment_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        file_size bigint,
+        post_id bigint not null,
+        updated_at timestamp(6) not null,
+        file_name varchar(255) not null,
+        file_path varchar(255) not null,
+        file_type varchar(255),
+        primary key (attachment_id)
+    )
+Hibernate: 
+    create table post_attachments (
+        download_count integer,
+        attachment_id bigint generated by default as identity,
+        created_at timestamp(6) not null,
+        file_size bigint,
+        post_id bigint not null,
+        updated_at timestamp(6) not null,
+        file_name varchar(255) not null,
+        file_path varchar(255) not null,
+        file_type varchar(255),
+        primary key (attachment_id)
+    )
+2025-09-05 18:03:33 - 
+    create table posts (
+        is_deleted boolean,
+        is_notice boolean,
+        is_secret boolean,
+        like_count integer,
+        notice_end_date date,
+        notice_start_date date,
+        view_count integer,
+        board_id bigint not null,
+        created_at timestamp(6) not null,
+        post_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        writer_id bigint not null,
+        title varchar(200) not null,
+        content TEXT not null,
+        primary key (post_id)
+    )
+Hibernate: 
+    create table posts (
+        is_deleted boolean,
+        is_notice boolean,
+        is_secret boolean,
+        like_count integer,
+        notice_end_date date,
+        notice_start_date date,
+        view_count integer,
+        board_id bigint not null,
+        created_at timestamp(6) not null,
+        post_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        writer_id bigint not null,
+        title varchar(200) not null,
+        content TEXT not null,
+        primary key (post_id)
+    )
+2025-09-05 18:03:33 - 
+    create table roles (
+        is_active boolean not null,
+        created_at timestamp(6) not null,
+        role_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        role_code varchar(20) not null unique,
+        role_name varchar(50) not null unique,
+        description varchar(255),
+        permissions TEXT,
+        primary key (role_id)
+    )
+Hibernate: 
+    create table roles (
+        is_active boolean not null,
+        created_at timestamp(6) not null,
+        role_id bigint generated by default as identity,
+        updated_at timestamp(6) not null,
+        role_code varchar(20) not null unique,
+        role_name varchar(50) not null unique,
+        description varchar(255),
+        permissions TEXT,
+        primary key (role_id)
+    )
+2025-09-05 18:03:33 - 
+    create table user_roles (
+        role_id bigint not null,
+        user_id bigint not null,
+        primary key (role_id, user_id)
+    )
+Hibernate: 
+    create table user_roles (
+        role_id bigint not null,
+        user_id bigint not null,
+        primary key (role_id, user_id)
+    )
+2025-09-05 18:03:33 - 
+    create table users (
+        hire_date date,
+        is_active boolean,
+        is_deleted boolean,
+        last_login_at date,
+        login_attempts integer,
+        password_changed_at date,
+        created_at timestamp(6) not null,
+        department_id bigint,
+        position_id bigint,
+        updated_at timestamp(6) not null,
+        user_id bigint generated by default as identity,
+        login_id varchar(20) not null unique,
+        phone varchar(20),
+        status varchar(20) not null check (status in ('ACTIVE','INACTIVE','SUSPENDED','PENDING')),
+        name varchar(50) not null,
+        email varchar(255) unique,
+        password varchar(255) not null,
+        profile_image varchar(255),
+        primary key (user_id)
+    )
+Hibernate: 
+    create table users (
+        hire_date date,
+        is_active boolean,
+        is_deleted boolean,
+        last_login_at date,
+        login_attempts integer,
+        password_changed_at date,
+        created_at timestamp(6) not null,
+        department_id bigint,
+        position_id bigint,
+        updated_at timestamp(6) not null,
+        user_id bigint generated by default as identity,
+        login_id varchar(20) not null unique,
+        phone varchar(20),
+        status varchar(20) not null check (status in ('ACTIVE','INACTIVE','SUSPENDED','PENDING')),
+        name varchar(50) not null,
+        email varchar(255) unique,
+        password varchar(255) not null,
+        profile_image varchar(255),
+        primary key (user_id)
+    )
+2025-09-05 18:03:33 - 
+    create index idx_doc_number 
+       on approval_documents (doc_number)
+Hibernate: 
+    create index idx_doc_number 
+       on approval_documents (doc_number)
+2025-09-05 18:03:33 - 
+    create index idx_drafter 
+       on approval_documents (drafter_id)
+Hibernate: 
+    create index idx_drafter 
+       on approval_documents (drafter_id)
+2025-09-05 18:03:33 - 
+    create index idx_current_approver 
+       on approval_documents (current_approver_id)
+Hibernate: 
+    create index idx_current_approver 
+       on approval_documents (current_approver_id)
+2025-09-05 18:03:33 - 
+    create index idx_status 
+       on approval_documents (status)
+Hibernate: 
+    create index idx_status 
+       on approval_documents (status)
+2025-09-05 18:03:33 - 
+    create index idx_doc_order 
+       on approval_lines (doc_id, order_seq)
+Hibernate: 
+    create index idx_doc_order 
+       on approval_lines (doc_id, order_seq)
+2025-09-05 18:03:33 - 
+    create index idx_approver 
+       on approval_lines (approver_id)
+Hibernate: 
+    create index idx_approver 
+       on approval_lines (approver_id)
+2025-09-05 18:03:33 - 
+    create index idx_comments_post 
+       on comments (post_id)
+Hibernate: 
+    create index idx_comments_post 
+       on comments (post_id)
+2025-09-05 18:03:33 - 
+    create index idx_comments_writer 
+       on comments (writer_id)
+Hibernate: 
+    create index idx_comments_writer 
+       on comments (writer_id)
+2025-09-05 18:03:33 - 
+    create index idx_comments_parent 
+       on comments (parent_comment_id)
+Hibernate: 
+    create index idx_comments_parent 
+       on comments (parent_comment_id)
+2025-09-05 18:03:33 - 
+    create index idx_posts_board 
+       on posts (board_id)
+Hibernate: 
+    create index idx_posts_board 
+       on posts (board_id)
+2025-09-05 18:03:33 - 
+    create index idx_posts_writer 
+       on posts (writer_id)
+Hibernate: 
+    create index idx_posts_writer 
+       on posts (writer_id)
+2025-09-05 18:03:33 - 
+    create index idx_posts_created 
+       on posts (created_at)
+Hibernate: 
+    create index idx_posts_created 
+       on posts (created_at)
+2025-09-05 18:03:33 - 
+    alter table if exists approval_attachments 
+       add constraint FKhit6jtkncj8nic4vg1qgsetcy 
+       foreign key (doc_id) 
+       references approval_documents
+Hibernate: 
+    alter table if exists approval_attachments 
+       add constraint FKhit6jtkncj8nic4vg1qgsetcy 
+       foreign key (doc_id) 
+       references approval_documents
+2025-09-05 18:03:33 - 
+    alter table if exists approval_attachments 
+       add constraint FKc4n3987wh6t7aevarm5kw7crw 
+       foreign key (uploaded_by) 
+       references users
+Hibernate: 
+    alter table if exists approval_attachments 
+       add constraint FKc4n3987wh6t7aevarm5kw7crw 
+       foreign key (uploaded_by) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists approval_documents 
+       add constraint FKku3gjj4k28cn44kme0h9oofid 
+       foreign key (current_approver_id) 
+       references users
+Hibernate: 
+    alter table if exists approval_documents 
+       add constraint FKku3gjj4k28cn44kme0h9oofid 
+       foreign key (current_approver_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists approval_documents 
+       add constraint FKn0kcj8ssnsaqo3f3f96v5qtnt 
+       foreign key (drafter_id) 
+       references users
+Hibernate: 
+    alter table if exists approval_documents 
+       add constraint FKn0kcj8ssnsaqo3f3f96v5qtnt 
+       foreign key (drafter_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists approval_lines 
+       add constraint FKf4nt5is331ydehbbjpjd5odt7 
+       foreign key (approver_id) 
+       references users
+Hibernate: 
+    alter table if exists approval_lines 
+       add constraint FKf4nt5is331ydehbbjpjd5odt7 
+       foreign key (approver_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists approval_lines 
+       add constraint FK1n9wejba7lyli8awma6fxh2mp 
+       foreign key (delegated_to) 
+       references users
+Hibernate: 
+    alter table if exists approval_lines 
+       add constraint FK1n9wejba7lyli8awma6fxh2mp 
+       foreign key (delegated_to) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists approval_lines 
+       add constraint FK846mnuhx9w701w4ucig9njua3 
+       foreign key (doc_id) 
+       references approval_documents
+Hibernate: 
+    alter table if exists approval_lines 
+       add constraint FK846mnuhx9w701w4ucig9njua3 
+       foreign key (doc_id) 
+       references approval_documents
+2025-09-05 18:03:33 - 
+    alter table if exists comments 
+       add constraint FK7h839m3lkvhbyv3bcdv7sm4fj 
+       foreign key (parent_comment_id) 
+       references comments
+Hibernate: 
+    alter table if exists comments 
+       add constraint FK7h839m3lkvhbyv3bcdv7sm4fj 
+       foreign key (parent_comment_id) 
+       references comments
+2025-09-05 18:03:33 - 
+    alter table if exists comments 
+       add constraint FKh4c7lvsc298whoyd4w9ta25cr 
+       foreign key (post_id) 
+       references posts
+Hibernate: 
+    alter table if exists comments 
+       add constraint FKh4c7lvsc298whoyd4w9ta25cr 
+       foreign key (post_id) 
+       references posts
+2025-09-05 18:03:33 - 
+    alter table if exists comments 
+       add constraint FKtdvhgjfwg764l2sltaixna6ku 
+       foreign key (writer_id) 
+       references users
+Hibernate: 
+    alter table if exists comments 
+       add constraint FKtdvhgjfwg764l2sltaixna6ku 
+       foreign key (writer_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists departments 
+       add constraint FKia71ute4clfbt6u2auufvw1bv 
+       foreign key (manager_id) 
+       references users
+Hibernate: 
+    alter table if exists departments 
+       add constraint FKia71ute4clfbt6u2auufvw1bv 
+       foreign key (manager_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists departments 
+       add constraint FK1923gg33l60s3fd2kyvd1820w 
+       foreign key (parent_dept_id) 
+       references departments
+Hibernate: 
+    alter table if exists departments 
+       add constraint FK1923gg33l60s3fd2kyvd1820w 
+       foreign key (parent_dept_id) 
+       references departments
+2025-09-05 18:03:33 - 
+    alter table if exists expense_items 
+       add constraint FKayi8j9gindb94p7fwgo32pjyt 
+       foreign key (expense_request_id) 
+       references expense_requests
+Hibernate: 
+    alter table if exists expense_items 
+       add constraint FKayi8j9gindb94p7fwgo32pjyt 
+       foreign key (expense_request_id) 
+       references expense_requests
+2025-09-05 18:03:33 - 
+    alter table if exists expense_requests 
+       add constraint FKexxinaw9d0kmnjajk4xidnr99 
+       foreign key (doc_id) 
+       references approval_documents
+Hibernate: 
+    alter table if exists expense_requests 
+       add constraint FKexxinaw9d0kmnjajk4xidnr99 
+       foreign key (doc_id) 
+       references approval_documents
+2025-09-05 18:03:33 - 
+    alter table if exists leave_requests 
+       add constraint FK4thkhfsln7al7279q65vrdjfq 
+       foreign key (doc_id) 
+       references approval_documents
+Hibernate: 
+    alter table if exists leave_requests 
+       add constraint FK4thkhfsln7al7279q65vrdjfq 
+       foreign key (doc_id) 
+       references approval_documents
+2025-09-05 18:03:33 - 
+    alter table if exists notifications 
+       add constraint FK9y21adhxn0ayjhfocscqox7bh 
+       foreign key (user_id) 
+       references users
+Hibernate: 
+    alter table if exists notifications 
+       add constraint FK9y21adhxn0ayjhfocscqox7bh 
+       foreign key (user_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists overtime_requests 
+       add constraint FKd1795o4s53dopmxu3alq9b7pc 
+       foreign key (doc_id) 
+       references approval_documents
+Hibernate: 
+    alter table if exists overtime_requests 
+       add constraint FKd1795o4s53dopmxu3alq9b7pc 
+       foreign key (doc_id) 
+       references approval_documents
+2025-09-05 18:03:33 - 
+    alter table if exists post_attachments 
+       add constraint FKdwocy2l1nlf11ebpfrax6sto1 
+       foreign key (post_id) 
+       references posts
+Hibernate: 
+    alter table if exists post_attachments 
+       add constraint FKdwocy2l1nlf11ebpfrax6sto1 
+       foreign key (post_id) 
+       references posts
+2025-09-05 18:03:33 - 
+    alter table if exists posts 
+       add constraint FK78qo1gxd85rcxqojt2cpcmuj6 
+       foreign key (board_id) 
+       references boards
+Hibernate: 
+    alter table if exists posts 
+       add constraint FK78qo1gxd85rcxqojt2cpcmuj6 
+       foreign key (board_id) 
+       references boards
+2025-09-05 18:03:33 - 
+    alter table if exists posts 
+       add constraint FK3bu22k9yptnwjuu93y4ht1l61 
+       foreign key (writer_id) 
+       references users
+Hibernate: 
+    alter table if exists posts 
+       add constraint FK3bu22k9yptnwjuu93y4ht1l61 
+       foreign key (writer_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists user_roles 
+       add constraint FKh8ciramu9cc9q3qcqiv4ue8a6 
+       foreign key (role_id) 
+       references roles
+Hibernate: 
+    alter table if exists user_roles 
+       add constraint FKh8ciramu9cc9q3qcqiv4ue8a6 
+       foreign key (role_id) 
+       references roles
+2025-09-05 18:03:33 - 
+    alter table if exists user_roles 
+       add constraint FKhfh9dx7w3ubf1co1vdev94g3f 
+       foreign key (user_id) 
+       references users
+Hibernate: 
+    alter table if exists user_roles 
+       add constraint FKhfh9dx7w3ubf1co1vdev94g3f 
+       foreign key (user_id) 
+       references users
+2025-09-05 18:03:33 - 
+    alter table if exists users 
+       add constraint FKsbg59w8q63i0oo53rlgvlcnjq 
+       foreign key (department_id) 
+       references departments
+Hibernate: 
+    alter table if exists users 
+       add constraint FKsbg59w8q63i0oo53rlgvlcnjq 
+       foreign key (department_id) 
+       references departments
+2025-09-05 18:03:33 - 
+    alter table if exists users 
+       add constraint FK6ph6xiiydudp6umjf2xckbbmi 
+       foreign key (position_id) 
+       references positions
+Hibernate: 
+    alter table if exists users 
+       add constraint FK6ph6xiiydudp6umjf2xckbbmi 
+       foreign key (position_id) 
+       references positions
+2025-09-05 18:03:34 - Started UserTest in 2.849 seconds (process running for 3.37)
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 0, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 1, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Before test method: class [UserTest], method [saveUser], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:34 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [saveUser]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 2, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.saveUser()]
+2025-09-05 18:03:34 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [saveUser]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 3, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 4, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 5, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 6, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 7, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 8, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 9, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 10, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 11, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 12, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 13, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 14, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [saveUser]
+2025-09-05 18:03:34 - After test method: class [UserTest], method [saveUser], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:34 - Performing dependency injection for test class com.liteware.model.entity.UserTest
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 15, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 16, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Before test method: class [UserTest], method [userPositionRelationship], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:34 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [userPositionRelationship]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 17, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.userPositionRelationship()]
+2025-09-05 18:03:34 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [userPositionRelationship]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 18, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 19, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 20, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 21, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - 
+    insert 
+    into
+        positions
+        (created_at, description, is_active, position_code, position_level, position_name, sort_order, updated_at, position_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        positions
+        (created_at, description, is_active, position_code, position_level, position_name, sort_order, updated_at, position_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-09-05 18:03:34 - 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-09-05 18:03:34 - 
+    select
+        u1_0.user_id,
+        u1_0.is_active,
+        u1_0.created_at,
+        u1_0.department_id,
+        u1_0.email,
+        u1_0.hire_date,
+        u1_0.is_deleted,
+        u1_0.last_login_at,
+        u1_0.login_attempts,
+        u1_0.login_id,
+        u1_0.name,
+        u1_0.password,
+        u1_0.password_changed_at,
+        u1_0.phone,
+        u1_0.position_id,
+        u1_0.profile_image,
+        u1_0.status,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.is_active,
+        u1_0.created_at,
+        u1_0.department_id,
+        u1_0.email,
+        u1_0.hire_date,
+        u1_0.is_deleted,
+        u1_0.last_login_at,
+        u1_0.login_attempts,
+        u1_0.login_id,
+        u1_0.name,
+        u1_0.password,
+        u1_0.password_changed_at,
+        u1_0.phone,
+        u1_0.position_id,
+        u1_0.profile_image,
+        u1_0.status,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.user_id=?
+2025-09-05 18:03:34 - 
+    select
+        p1_0.position_id,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.is_active,
+        p1_0.position_code,
+        p1_0.position_level,
+        p1_0.position_name,
+        p1_0.sort_order,
+        p1_0.updated_at 
+    from
+        positions p1_0 
+    where
+        p1_0.position_id=?
+Hibernate: 
+    select
+        p1_0.position_id,
+        p1_0.created_at,
+        p1_0.description,
+        p1_0.is_active,
+        p1_0.position_code,
+        p1_0.position_level,
+        p1_0.position_name,
+        p1_0.sort_order,
+        p1_0.updated_at 
+    from
+        positions p1_0 
+    where
+        p1_0.position_id=?
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 22, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 23, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 24, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 25, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 26, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 27, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 28, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 29, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [userPositionRelationship]
+2025-09-05 18:03:34 - After test method: class [UserTest], method [userPositionRelationship], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:34 - Performing dependency injection for test class com.liteware.model.entity.UserTest
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 30, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 31, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Before test method: class [UserTest], method [updateUser], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:34 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [updateUser]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 32, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.updateUser() throws java.lang.InterruptedException]
+2025-09-05 18:03:34 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [updateUser]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 33, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 34, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 35, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 36, missCount = 1, failureCount = 0]
+2025-09-05 18:03:34 - 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-09-05 18:03:35 - 
+    update
+        users 
+    set
+        is_active=?,
+        department_id=?,
+        email=?,
+        hire_date=?,
+        is_deleted=?,
+        last_login_at=?,
+        login_attempts=?,
+        login_id=?,
+        name=?,
+        password=?,
+        password_changed_at=?,
+        phone=?,
+        position_id=?,
+        profile_image=?,
+        status=?,
+        updated_at=? 
+    where
+        user_id=?
+Hibernate: 
+    update
+        users 
+    set
+        is_active=?,
+        department_id=?,
+        email=?,
+        hire_date=?,
+        is_deleted=?,
+        last_login_at=?,
+        login_attempts=?,
+        login_id=?,
+        name=?,
+        password=?,
+        password_changed_at=?,
+        phone=?,
+        position_id=?,
+        profile_image=?,
+        status=?,
+        updated_at=? 
+    where
+        user_id=?
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 37, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 38, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 39, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 40, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 41, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 42, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 43, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 44, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [updateUser]
+2025-09-05 18:03:35 - After test method: class [UserTest], method [updateUser], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Performing dependency injection for test class com.liteware.model.entity.UserTest
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 45, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 46, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Before test method: class [UserTest], method [validateRequiredFields], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [validateRequiredFields]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 47, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.validateRequiredFields()]
+2025-09-05 18:03:35 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [validateRequiredFields]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 48, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 49, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 50, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 51, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 52, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 53, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 54, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 55, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 56, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 57, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 58, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 59, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [validateRequiredFields]
+2025-09-05 18:03:35 - After test method: class [UserTest], method [validateRequiredFields], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Performing dependency injection for test class com.liteware.model.entity.UserTest
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 60, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 61, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Before test method: class [UserTest], method [createUser], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [createUser]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 62, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.createUser()]
+2025-09-05 18:03:35 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [createUser]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 63, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 64, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 65, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 66, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 67, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 68, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 69, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 70, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 71, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 72, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 73, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 74, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [createUser]
+2025-09-05 18:03:35 - After test method: class [UserTest], method [createUser], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Performing dependency injection for test class com.liteware.model.entity.UserTest
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 75, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 76, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Before test method: class [UserTest], method [userDepartmentRelationship], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [userDepartmentRelationship]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 77, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.userDepartmentRelationship()]
+2025-09-05 18:03:35 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [userDepartmentRelationship]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 78, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 79, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 80, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 81, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - 
+    insert 
+    into
+        departments
+        (created_at, dept_code, dept_level, dept_name, description, is_active, manager_id, parent_dept_id, sort_order, updated_at, dept_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        departments
+        (created_at, dept_code, dept_level, dept_name, description, is_active, manager_id, parent_dept_id, sort_order, updated_at, dept_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-09-05 18:03:35 - 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-09-05 18:03:35 - 
+    select
+        u1_0.user_id,
+        u1_0.is_active,
+        u1_0.created_at,
+        u1_0.department_id,
+        u1_0.email,
+        u1_0.hire_date,
+        u1_0.is_deleted,
+        u1_0.last_login_at,
+        u1_0.login_attempts,
+        u1_0.login_id,
+        u1_0.name,
+        u1_0.password,
+        u1_0.password_changed_at,
+        u1_0.phone,
+        u1_0.position_id,
+        u1_0.profile_image,
+        u1_0.status,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.user_id=?
+Hibernate: 
+    select
+        u1_0.user_id,
+        u1_0.is_active,
+        u1_0.created_at,
+        u1_0.department_id,
+        u1_0.email,
+        u1_0.hire_date,
+        u1_0.is_deleted,
+        u1_0.last_login_at,
+        u1_0.login_attempts,
+        u1_0.login_id,
+        u1_0.name,
+        u1_0.password,
+        u1_0.password_changed_at,
+        u1_0.phone,
+        u1_0.position_id,
+        u1_0.profile_image,
+        u1_0.status,
+        u1_0.updated_at 
+    from
+        users u1_0 
+    where
+        u1_0.user_id=?
+2025-09-05 18:03:35 - 
+    select
+        d1_0.dept_id,
+        d1_0.created_at,
+        d1_0.dept_code,
+        d1_0.dept_level,
+        d1_0.dept_name,
+        d1_0.description,
+        d1_0.is_active,
+        d1_0.manager_id,
+        d1_0.parent_dept_id,
+        d1_0.sort_order,
+        d1_0.updated_at 
+    from
+        departments d1_0 
+    where
+        d1_0.dept_id=?
+Hibernate: 
+    select
+        d1_0.dept_id,
+        d1_0.created_at,
+        d1_0.dept_code,
+        d1_0.dept_level,
+        d1_0.dept_name,
+        d1_0.description,
+        d1_0.is_active,
+        d1_0.manager_id,
+        d1_0.parent_dept_id,
+        d1_0.sort_order,
+        d1_0.updated_at 
+    from
+        departments d1_0 
+    where
+        d1_0.dept_id=?
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 82, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 83, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 84, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 85, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 86, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 87, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 88, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 89, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [userDepartmentRelationship]
+2025-09-05 18:03:35 - After test method: class [UserTest], method [userDepartmentRelationship], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Performing dependency injection for test class com.liteware.model.entity.UserTest
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 90, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 91, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Before test method: class [UserTest], method [validateEmailFormat], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [validateEmailFormat]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 92, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.validateEmailFormat()]
+2025-09-05 18:03:35 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [validateEmailFormat]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 93, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 94, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 95, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 96, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 97, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 98, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 99, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 100, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 101, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 102, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 103, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 104, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [validateEmailFormat]
+2025-09-05 18:03:35 - After test method: class [UserTest], method [validateEmailFormat], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Performing dependency injection for test class com.liteware.model.entity.UserTest
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 105, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 106, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Before test method: class [UserTest], method [changeUserStatus], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Explicit transaction definition [PROPAGATION_REQUIRED,ISOLATION_DEFAULT] found for test class [com.liteware.model.entity.UserTest] and test method [changeUserStatus]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 107, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - No method-level @Rollback override: using default rollback [true] for test method [void com.liteware.model.entity.UserTest.changeUserStatus()]
+2025-09-05 18:03:35 - Began transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [changeUserStatus]; transaction manager [org.springframework.orm.jpa.JpaTransactionManager@100235c7]; rollback [true]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 108, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 109, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 110, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 111, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+Hibernate: 
+    insert 
+    into
+        users
+        (is_active, created_at, department_id, email, hire_date, is_deleted, last_login_at, login_attempts, login_id, name, password, password_changed_at, phone, position_id, profile_image, status, updated_at, user_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2025-09-05 18:03:35 - 
+    update
+        users 
+    set
+        is_active=?,
+        department_id=?,
+        email=?,
+        hire_date=?,
+        is_deleted=?,
+        last_login_at=?,
+        login_attempts=?,
+        login_id=?,
+        name=?,
+        password=?,
+        password_changed_at=?,
+        phone=?,
+        position_id=?,
+        profile_image=?,
+        status=?,
+        updated_at=? 
+    where
+        user_id=?
+Hibernate: 
+    update
+        users 
+    set
+        is_active=?,
+        department_id=?,
+        email=?,
+        hire_date=?,
+        is_deleted=?,
+        last_login_at=?,
+        login_attempts=?,
+        login_id=?,
+        name=?,
+        password=?,
+        password_changed_at=?,
+        phone=?,
+        position_id=?,
+        profile_image=?,
+        status=?,
+        updated_at=? 
+    where
+        user_id=?
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 112, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 113, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 114, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 115, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 116, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 117, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 118, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 119, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - Rolled back transaction (1) for test class [com.liteware.model.entity.UserTest]; test method [changeUserStatus]
+2025-09-05 18:03:35 - After test method: class [UserTest], method [changeUserStatus], class annotated with @DirtiesContext [false] with mode [null], method annotated with @DirtiesContext [false] with mode [null]
+2025-09-05 18:03:35 - Spring test ApplicationContext cache statistics: [DefaultContextCache@77073238 size = 1, maxSize = 32, parentContextCount = 0, hitCount = 120, missCount = 1, failureCount = 0]
+2025-09-05 18:03:35 - After test class: class [UserTest], class annotated with @DirtiesContext [false] with mode [null]
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 8.5</a> at 2025. 9. 5. 오후 6:03:36</p>
+</div>
+</div>
+</body>
+</html>

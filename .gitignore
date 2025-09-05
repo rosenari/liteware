@@ -1,2 +1,7 @@
 .idea/
 .claude/
+
+# Gradle
+gradle-*/
+gradle.zip
+build/libs/*.jar

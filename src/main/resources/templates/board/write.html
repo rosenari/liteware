@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>게시글 작성 | Liteware</title>
+    <!-- Summernote CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{layout/base :: content-header(pageTitle='게시글 작성')"></div>
+    
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">
+                <i class="fas fa-pen"></i> 새 게시글 작성
+            </h3>
+        </div>
+        
+        <form th:action="@{/board/{boardId}/write(boardId=${boardId})}" method="post" enctype="multipart/form-data">
+            <div class="card-body">
+                <!-- 공지사항 설정 (관리자만) -->
+                <div class="form-group" sec:authorize="hasRole('ADMIN')">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="isNotice" name="isNotice">
+                        <label class="custom-control-label" for="isNotice">
+                            <i class="fas fa-bullhorn"></i> 공지사항으로 등록
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- 제목 -->
+                <div class="form-group">
+                    <label>제목 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="title" required 
+                           placeholder="제목을 입력하세요" maxlength="100">
+                </div>
+                
+                <!-- 내용 -->
+                <div class="form-group">
+                    <label>내용 <span class="text-danger">*</span></label>
+                    <textarea id="summernote" name="content" required></textarea>
+                </div>
+                
+                <!-- 첨부파일 -->
+                <div class="form-group">
+                    <label>첨부파일</label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="attachments" 
+                               name="attachments" multiple accept=".jpg,.jpeg,.png,.gif,.pdf,.doc,.docx,.xls,.xlsx,.zip">
+                        <label class="custom-file-label" for="attachments">파일을 선택하세요</label>
+                    </div>
+                    <small class="form-text text-muted">
+                        최대 10MB, 최대 5개 파일까지 첨부 가능 (jpg, png, pdf, doc, xls, zip 등)
+                    </small>
+                    <div id="fileList" class="mt-2"></div>
+                </div>
+                
+                <!-- 추가 옵션 -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="allowComment" 
+                                       name="allowComment" checked>
+                                <label class="custom-control-label" for="allowComment">
+                                    댓글 허용
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="isSecret" name="isSecret">
+                                <label class="custom-control-label" for="isSecret">
+                                    비밀글 설정
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer">
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> 등록
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                        <i class="fas fa-file-alt"></i> 임시저장
+                    </button>
+                    <a th:href="@{/board/{boardId}(boardId=${boardId})}" class="btn btn-danger">
+                        <i class="fas fa-times"></i> 취소
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+<!-- Summernote JS -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Summernote 초기화
+    $('#summernote').summernote({
+        height: 400,
+        lang: 'ko-KR',
+        placeholder: '내용을 입력하세요',
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'clear']],
+            ['fontname', ['fontname']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ],
+        callbacks: {
+            onImageUpload: function(files) {
+                // 이미지 업로드 처리
+                for (let i = 0; i < files.length; i++) {
+                    uploadImage(files[i]);
+                }
+            }
+        }
+    });
+    
+    // 파일 선택시 라벨 변경 및 목록 표시
+    $('#attachments').on('change', function() {
+        var files = $(this)[0].files;
+        var label = files.length > 1 ? files.length + '개 파일 선택됨' : (files.length === 1 ? files[0].name : '파일을 선택하세요');
+        $(this).next('.custom-file-label').text(label);
+        
+        // 파일 목록 표시
+        var fileList = $('#fileList');
+        fileList.empty();
+        
+        for (let i = 0; i < files.length; i++) {
+            var fileSize = (files[i].size / 1024 / 1024).toFixed(2); // MB 단위
+            
+            if (fileSize > 10) {
+                fileList.append('<div class="text-danger"><i class="fas fa-exclamation-triangle"></i> ' + 
+                               files[i].name + ' (' + fileSize + 'MB) - 파일 크기 초과</div>');
+            } else {
+                fileList.append('<div class="text-success"><i class="fas fa-check-circle"></i> ' + 
+                               files[i].name + ' (' + fileSize + 'MB)</div>');
+            }
+        }
+    });
+});
+
+// 이미지 업로드
+function uploadImage(file) {
+    var formData = new FormData();
+    formData.append('file', file);
+    
+    $.ajax({
+        url: '/api/upload/image',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(url) {
+            $('#summernote').summernote('insertImage', url);
+        },
+        error: function() {
+            alert('이미지 업로드에 실패했습니다.');
+        }
+    });
+}
+
+// 임시저장
+function saveDraft() {
+    var title = $('input[name="title"]').val();
+    var content = $('#summernote').summernote('code');
+    
+    if (!title) {
+        alert('제목을 입력해주세요.');
+        return;
+    }
+    
+    var draftData = {
+        title: title,
+        content: content,
+        boardId: [[${boardId}]]
+    };
+    
+    $.ajax({
+        url: '/api/board/draft',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(draftData),
+        success: function() {
+            alert('임시저장되었습니다.');
+        },
+        error: function() {
+            alert('임시저장에 실패했습니다.');
+        }
+    });
+}
+
+// 폼 제출 전 유효성 검사
+$('form').on('submit', function(e) {
+    var title = $('input[name="title"]').val();
+    var content = $('#summernote').summernote('code');
+    
+    if (!title || title.trim() === '') {
+        e.preventDefault();
+        alert('제목을 입력해주세요.');
+        return false;
+    }
+    
+    if (!content || content === '<p><br></p>' || content.trim() === '') {
+        e.preventDefault();
+        alert('내용을 입력해주세요.');
+        return false;
+    }
+    
+    // 파일 크기 검사
+    var files = $('#attachments')[0].files;
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].size > 10 * 1024 * 1024) { // 10MB
+            e.preventDefault();
+            alert(files[i].name + ' 파일이 10MB를 초과합니다.');
+            return false;
+        }
+    }
+    
+    return true;
+});
+</script>
+</th:block>
+</body>
+</html>

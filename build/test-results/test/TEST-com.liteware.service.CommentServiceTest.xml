@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.liteware.service.CommentServiceTest" tests="11" skipped="0" failures="0" errors="0" timestamp="2025-09-05T09:03:35" hostname="imjangsun-ui-MacBookPro.local" time="0.051">
+  <properties/>
+  <testcase name="댓글을 작성할 수 있어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.035"/>
+  <testcase name="게시글의 댓글 목록을 조회할 수 있어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="댓글 수를 조회할 수 있어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="댓글을 수정할 수 있어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="대댓글을 작성할 수 있어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="내가 작성한 댓글 목록을 조회할 수 있어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="작성자가 아닌 사용자는 댓글을 수정할 수 없어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="댓글 깊이는 2를 초과할 수 없어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="댓글을 삭제할 수 있어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.002"/>
+  <testcase name="대댓글이 있는 댓글은 삭제 표시만 해야 한다" classname="com.liteware.service.CommentServiceTest" time="0.001"/>
+  <testcase name="작성자가 아닌 사용자는 댓글을 삭제할 수 없어야 한다" classname="com.liteware.service.CommentServiceTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

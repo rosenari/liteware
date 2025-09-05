@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>기안 작성 | Liteware</title>
+    <!-- Summernote CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.css" rel="stylesheet">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.5.2/dist/select2-bootstrap4.min.css">
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{layout/base :: content-header(pageTitle='기안 작성')}"></div>
+    
+    <form id="draftForm" method="post" action="/approval/draft" enctype="multipart/form-data">
+        <div class="row">
+            <!-- 좌측 영역: 문서 작성 -->
+            <div class="col-md-8">
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-edit"></i> 문서 작성
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- 문서 유형 선택 -->
+                        <div class="form-group">
+                            <label>문서 유형 <span class="text-danger">*</span></label>
+                            <select class="form-control select2" id="docType" name="docType" required>
+                                <option value="">선택하세요</option>
+                                <option value="VACATION">휴가 신청</option>
+                                <option value="OVERTIME">연장근무 신청</option>
+                                <option value="EXPENSE">경비 청구</option>
+                                <option value="PURCHASE">구매 요청</option>
+                                <option value="GENERAL">일반 기안</option>
+                                <option value="REPORT">업무 보고</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 휴가 신청 양식 -->
+                        <div id="vacationForm" class="doc-form" style="display:none;">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>휴가 종류</label>
+                                        <select class="form-control" name="vacationType">
+                                            <option value="ANNUAL">연차</option>
+                                            <option value="SICK">병가</option>
+                                            <option value="SPECIAL">경조사</option>
+                                            <option value="OTHER">기타</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>긴급도</label>
+                                        <select class="form-control" name="urgency">
+                                            <option value="NORMAL">보통</option>
+                                            <option value="URGENT">긴급</option>
+                                            <option value="VERY_URGENT">매우긴급</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>시작일</label>
+                                        <input type="date" class="form-control" name="startDate">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>종료일</label>
+                                        <input type="date" class="form-control" name="endDate">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 경비 청구 양식 -->
+                        <div id="expenseForm" class="doc-form" style="display:none;">
+                            <div class="form-group">
+                                <label>청구 금액</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" name="amount" placeholder="0">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">원</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>사용 일자</label>
+                                <input type="date" class="form-control" name="expenseDate">
+                            </div>
+                            <div class="form-group">
+                                <label>사용 내역</label>
+                                <textarea class="form-control" name="expenseDetail" rows="3"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- 공통 필드 -->
+                        <div class="form-group">
+                            <label>제목 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="title" required 
+                                   placeholder="문서 제목을 입력하세요">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>내용 <span class="text-danger">*</span></label>
+                            <textarea id="summernote" name="content" required></textarea>
+                        </div>
+                        
+                        <!-- 첨부파일 -->
+                        <div class="form-group">
+                            <label>첨부파일</label>
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="attachments" name="attachments" multiple>
+                                <label class="custom-file-label" for="attachments">파일을 선택하세요</label>
+                            </div>
+                            <small class="form-text text-muted">
+                                최대 10MB, 여러 파일 선택 가능
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 우측 영역: 결재선 -->
+            <div class="col-md-4">
+                <!-- 결재선 설정 -->
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-route"></i> 결재선
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool btn-sm" data-toggle="modal" data-target="#approvalLineModal">
+                                <i class="fas fa-plus"></i> 결재자 추가
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-sm" id="approvalLineTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px">순서</th>
+                                    <th>결재자</th>
+                                    <th style="width: 80px">구분</th>
+                                    <th style="width: 40px"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="no-approver">
+                                    <td colspan="4" class="text-center text-muted py-3">
+                                        결재자를 추가하세요
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- 참조자 설정 -->
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-eye"></i> 참조자
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool btn-sm" data-toggle="modal" data-target="#referenceModal">
+                                <i class="fas fa-plus"></i> 참조자 추가
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="referenceList">
+                            <p class="text-muted text-center">참조자 없음</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 문서 정보 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-info-circle"></i> 문서 정보
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row mb-0">
+                            <dt class="col-sm-5">기안자</dt>
+                            <dd class="col-sm-7" th:text="${#authentication.name}">홍길동</dd>
+                            <dt class="col-sm-5">기안부서</dt>
+                            <dd class="col-sm-7">개발팀</dd>
+                            <dt class="col-sm-5">기안일</dt>
+                            <dd class="col-sm-7" th:text="${#temporals.format(#temporals.createNow(), 'yyyy.MM.dd')}"></dd>
+                            <dt class="col-sm-5">보존연한</dt>
+                            <dd class="col-sm-7">
+                                <select class="form-control form-control-sm" name="preservationYears">
+                                    <option value="1">1년</option>
+                                    <option value="3" selected>3년</option>
+                                    <option value="5">5년</option>
+                                    <option value="10">10년</option>
+                                    <option value="0">영구</option>
+                                </select>
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 하단 버튼 -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <button type="button" class="btn btn-default" onclick="saveDraft()">
+                            <i class="fas fa-save"></i> 임시저장
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> 결재요청
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="previewDocument()">
+                            <i class="fas fa-eye"></i> 미리보기
+                        </button>
+                        <a href="/approval" class="btn btn-danger">
+                            <i class="fas fa-times"></i> 취소
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 결재자 선택 모달 -->
+<div class="modal fade" id="approvalLineModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">결재자 선택</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6>조직도</h6>
+                        <div id="orgTree" style="height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                            <!-- 조직도 트리 -->
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h6>직원 목록</h6>
+                        <div class="form-group">
+                            <input type="text" class="form-control" placeholder="이름으로 검색">
+                        </div>
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>선택</th>
+                                    <th>이름</th>
+                                    <th>부서</th>
+                                    <th>직급</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox" value="1"></td>
+                                    <td>김부장</td>
+                                    <td>개발팀</td>
+                                    <td>부장</td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" value="2"></td>
+                                    <td>이과장</td>
+                                    <td>개발팀</td>
+                                    <td>과장</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="addApprovers()">추가</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+<!-- Summernote JS -->
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/lang/summernote-ko-KR.js"></script>
+<!-- Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Summernote 초기화
+    $('#summernote').summernote({
+        height: 400,
+        lang: 'ko-KR',
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'clear']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture']],
+            ['view', ['fullscreen', 'codeview', 'help']]
+        ]
+    });
+    
+    // Select2 초기화
+    $('.select2').select2({
+        theme: 'bootstrap4'
+    });
+    
+    // 문서 유형 변경시 양식 변경
+    $('#docType').change(function() {
+        $('.doc-form').hide();
+        
+        switch($(this).val()) {
+            case 'VACATION':
+                $('#vacationForm').show();
+                break;
+            case 'EXPENSE':
+                $('#expenseForm').show();
+                break;
+        }
+    });
+    
+    // 파일 선택시 라벨 변경
+    $('.custom-file-input').on('change', function() {
+        var files = $(this)[0].files;
+        var label = files.length > 1 ? files.length + '개 파일 선택됨' : files[0].name;
+        $(this).next('.custom-file-label').text(label);
+    });
+});
+
+// 결재자 추가
+function addApprovers() {
+    // 선택된 결재자 추가 로직
+    $('#approvalLineModal').modal('hide');
+}
+
+// 임시저장
+function saveDraft() {
+    alert('문서가 임시저장되었습니다.');
+}
+
+// 미리보기
+function previewDocument() {
+    window.open('/approval/preview', 'preview', 'width=800,height=600');
+}
+</script>
+</th:block>
+</body>
+</html>

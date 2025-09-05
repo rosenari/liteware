@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${post?.title} + ' | Liteware'">게시글 | Liteware</title>
+    <style>
+        .post-content { min-height: 300px; line-height: 1.8; }
+        .comment-item { border-bottom: 1px solid #e9ecef; padding: 15px 0; }
+        .comment-item:last-child { border-bottom: none; }
+        .comment-reply { margin-left: 40px; background-color: #f8f9fa; padding: 10px; border-radius: 5px; }
+        .comment-actions button { margin-right: 5px; }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{layout/base :: content-header(pageTitle='게시글 상세')"></div>
+    
+    <div class="card">
+        <!-- 게시글 헤더 -->
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3 class="card-title mb-0">
+                    <span class="badge badge-warning mr-2" th:if="${post?.isNotice}">공지</span>
+                    <span th:text="${post?.title}">게시글 제목</span>
+                </h3>
+                <div>
+                    <span class="badge badge-info">
+                        <i class="fas fa-eye"></i> 
+                        <span th:text="${post?.viewCount}">0</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 게시글 정보 -->
+        <div class="card-body">
+            <div class="row mb-3 pb-3 border-bottom">
+                <div class="col-md-6">
+                    <strong>작성자:</strong> 
+                    <span th:text="${post?.writer?.name}">홍길동</span>
+                    <span class="text-muted" th:text="'(' + ${post?.writer?.department?.name} + ')'"></span>
+                </div>
+                <div class="col-md-6 text-md-right">
+                    <strong>작성일:</strong> 
+                    <span th:text="${#temporals.format(post?.createdAt, 'yyyy.MM.dd HH:mm')}">2025.01.05 14:30</span>
+                    <span th:if="${post?.updatedAt != null and post?.updatedAt != post?.createdAt}">
+                        <br>
+                        <small class="text-muted">
+                            (수정: <span th:text="${#temporals.format(post?.updatedAt, 'yyyy.MM.dd HH:mm')}"></span>)
+                        </small>
+                    </span>
+                </div>
+            </div>
+            
+            <!-- 게시글 내용 -->
+            <div class="post-content" th:utext="${post?.content}">
+                게시글 내용이 여기에 표시됩니다.
+            </div>
+            
+            <!-- 첨부파일 -->
+            <div class="mt-4" th:if="${post?.attachments != null and !post.attachments.isEmpty()}">
+                <h6><i class="fas fa-paperclip"></i> 첨부파일</h6>
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       th:each="file : ${post.attachments}"
+                       th:href="@{/download/{fileId}(fileId=${file.fileId})}">
+                        <i class="fas fa-download"></i> 
+                        <span th:text="${file.fileName}">파일명.pdf</span>
+                        <span class="badge badge-secondary float-right" th:text="${file.fileSize}">1.2MB</span>
+                    </a>
+                </div>
+            </div>
+            
+            <!-- 게시글 액션 버튼 -->
+            <div class="mt-4 text-center">
+                <a th:href="@{/board/{boardId}(boardId=${boardId})}" class="btn btn-secondary">
+                    <i class="fas fa-list"></i> 목록
+                </a>
+                <a th:if="${canEdit}" 
+                   th:href="@{/board/{boardId}/post/{postId}/edit(boardId=${boardId}, postId=${post?.postId})}" 
+                   class="btn btn-primary">
+                    <i class="fas fa-edit"></i> 수정
+                </a>
+                <form th:if="${canEdit}" method="post" 
+                      th:action="@{/board/{boardId}/post/{postId}/delete(boardId=${boardId}, postId=${post?.postId})}"
+                      style="display: inline;" onsubmit="return confirm('정말 삭제하시겠습니까?');">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> 삭제
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 댓글 영역 -->
+    <div class="card mt-3" th:if="${post?.allowComment}">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-comments"></i> 댓글 
+                <span class="badge badge-primary" th:text="${comments != null ? comments.size() : 0}">0</span>
+            </h5>
+        </div>
+        
+        <div class="card-body">
+            <!-- 댓글 작성 폼 -->
+            <div class="mb-4" sec:authorize="isAuthenticated()">
+                <form id="commentForm">
+                    <div class="form-group">
+                        <textarea class="form-control" id="commentContent" rows="3" 
+                                  placeholder="댓글을 입력하세요" required></textarea>
+                    </div>
+                    <div class="text-right">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-comment"></i> 댓글 등록
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- 댓글 목록 -->
+            <div id="commentList">
+                <div class="comment-item" th:each="comment : ${comments}" th:if="${comments != null and !comments.isEmpty()}">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong th:text="${comment.writer?.name}">김철수</strong>
+                            <span class="text-muted ml-2" 
+                                  th:text="${#temporals.format(comment.createdAt, 'yyyy.MM.dd HH:mm')}">2025.01.05 15:30</span>
+                        </div>
+                        <div class="comment-actions" th:if="${comment.writer?.userId == #authentication?.principal?.userId}">
+                            <button class="btn btn-sm btn-link" onclick="editComment([[${comment.commentId}]])">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-link text-danger" onclick="deleteComment([[${comment.commentId}]])">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-2" th:text="${comment.content}">
+                        댓글 내용이 여기에 표시됩니다.
+                    </div>
+                    
+                    <!-- 대댓글 -->
+                    <div class="comment-reply mt-2" th:if="${comment.replies != null and !comment.replies.isEmpty()}">
+                        <div th:each="reply : ${comment.replies}">
+                            <strong th:text="${reply.writer?.name}">이영희</strong>
+                            <span class="text-muted ml-2" 
+                                  th:text="${#temporals.format(reply.createdAt, 'yyyy.MM.dd HH:mm')}"></span>
+                            <div th:text="${reply.content}">대댓글 내용</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 답글 버튼 -->
+                    <button class="btn btn-sm btn-link" onclick="showReplyForm([[${comment.commentId}]])">
+                        <i class="fas fa-reply"></i> 답글
+                    </button>
+                    
+                    <!-- 답글 작성 폼 (숨김) -->
+                    <div class="reply-form mt-2" th:id="'replyForm' + ${comment.commentId}" style="display: none;">
+                        <textarea class="form-control form-control-sm" rows="2" placeholder="답글을 입력하세요"></textarea>
+                        <div class="mt-1">
+                            <button class="btn btn-sm btn-primary" onclick="submitReply([[${comment.commentId}]])">등록</button>
+                            <button class="btn btn-sm btn-secondary" onclick="hideReplyForm([[${comment.commentId}]])">취소</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 댓글이 없을 때 -->
+                <div th:if="${comments == null or comments.isEmpty()}" class="text-center py-4">
+                    <p class="text-muted">첫 번째 댓글을 작성해보세요!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+<script>
+// 댓글 등록
+$('#commentForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    var content = $('#commentContent').val();
+    if (!content.trim()) {
+        alert('댓글 내용을 입력해주세요.');
+        return;
+    }
+    
+    var commentData = {
+        content: content,
+        postId: [[${post?.postId}]]
+    };
+    
+    $.ajax({
+        url: '/board/' + [[${boardId}]] + '/post/' + [[${post?.postId}]] + '/comment',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(commentData),
+        success: function(response) {
+            alert('댓글이 등록되었습니다.');
+            location.reload();
+        },
+        error: function() {
+            alert('댓글 등록에 실패했습니다.');
+        }
+    });
+});
+
+// 답글 폼 표시
+function showReplyForm(commentId) {
+    $('#replyForm' + commentId).show();
+}
+
+// 답글 폼 숨기기
+function hideReplyForm(commentId) {
+    $('#replyForm' + commentId).hide();
+}
+
+// 답글 등록
+function submitReply(commentId) {
+    var replyForm = $('#replyForm' + commentId);
+    var content = replyForm.find('textarea').val();
+    
+    if (!content.trim()) {
+        alert('답글 내용을 입력해주세요.');
+        return;
+    }
+    
+    var replyData = {
+        content: content,
+        parentId: commentId,
+        postId: [[${post?.postId}]]
+    };
+    
+    $.ajax({
+        url: '/board/' + [[${boardId}]] + '/post/' + [[${post?.postId}]] + '/comment',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(replyData),
+        success: function(response) {
+            alert('답글이 등록되었습니다.');
+            location.reload();
+        },
+        error: function() {
+            alert('답글 등록에 실패했습니다.');
+        }
+    });
+}
+
+// 댓글 수정
+function editComment(commentId) {
+    // 댓글 수정 로직
+    var newContent = prompt('수정할 내용을 입력하세요:');
+    if (newContent && newContent.trim()) {
+        $.ajax({
+            url: '/api/comment/' + commentId,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify({ content: newContent }),
+            success: function() {
+                alert('댓글이 수정되었습니다.');
+                location.reload();
+            },
+            error: function() {
+                alert('댓글 수정에 실패했습니다.');
+            }
+        });
+    }
+}
+
+// 댓글 삭제
+function deleteComment(commentId) {
+    if (confirm('정말 삭제하시겠습니까?')) {
+        $.ajax({
+            url: '/api/comment/' + commentId,
+            method: 'DELETE',
+            success: function() {
+                alert('댓글이 삭제되었습니다.');
+                location.reload();
+            },
+            error: function() {
+                alert('댓글 삭제에 실패했습니다.');
+            }
+        });
+    }
+}
+</script>
+</th:block>
+</body>
+</html>

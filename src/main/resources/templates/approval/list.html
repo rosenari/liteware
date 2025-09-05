@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title th:text="${title} + ' | Liteware'">전자결재</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div th:replace="~{layout/base :: content-header(pageTitle=${title})}"></div>
+    
+    <!-- 탭 메뉴 -->
+    <div class="card card-primary card-tabs">
+        <div class="card-header p-0 pt-1">
+            <ul class="nav nav-tabs" id="approval-tabs">
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${type == 'pending' ? 'active' : ''}" 
+                       href="/approval?type=pending">
+                        <i class="fas fa-clock"></i> 결재 대기
+                        <span class="badge badge-danger ml-1">4</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${type == 'drafted' ? 'active' : ''}" 
+                       href="/approval?type=drafted">
+                        <i class="fas fa-file-alt"></i> 기안 문서
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:classappend="${type == 'approved' ? 'active' : ''}" 
+                       href="/approval?type=approved">
+                        <i class="fas fa-check-circle"></i> 결재 완료
+                    </a>
+                </li>
+                <li class="nav-item ml-auto mr-3 mt-2">
+                    <a href="/approval/draft" class="btn btn-success btn-sm">
+                        <i class="fas fa-edit"></i> 새 기안 작성
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="card-body">
+            <!-- 검색 영역 -->
+            <div class="row mb-3">
+                <div class="col-md-3">
+                    <select class="form-control">
+                        <option>전체 문서 유형</option>
+                        <option>휴가 신청</option>
+                        <option>연장근무 신청</option>
+                        <option>경비 청구</option>
+                        <option>구매 요청</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control" placeholder="시작일">
+                </div>
+                <div class="col-md-3">
+                    <input type="date" class="form-control" placeholder="종료일">
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="문서명 검색">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 문서 목록 테이블 -->
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="checkAll">
+                                    <label class="custom-control-label" for="checkAll"></label>
+                                </div>
+                            </th>
+                            <th style="width: 100px">문서번호</th>
+                            <th style="width: 100px">문서유형</th>
+                            <th>제목</th>
+                            <th style="width: 100px">기안자</th>
+                            <th style="width: 100px">기안일</th>
+                            <th style="width: 80px">긴급도</th>
+                            <th style="width: 80px">상태</th>
+                            <th style="width: 100px">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="doc : ${documents}" th:if="${documents != null and !documents.isEmpty()}">
+                            <td>
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" th:id="'check' + ${doc.docId}">
+                                    <label class="custom-control-label" th:for="'check' + ${doc.docId}"></label>
+                                </div>
+                            </td>
+                            <td th:text="${doc.docNumber}">DOC-2025-001</td>
+                            <td>
+                                <span class="badge badge-info" th:text="${doc.docType?.description}">휴가신청</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/approval/{id}(id=${doc.docId})}" th:text="${doc.title}">
+                                    연차 휴가 신청의 건
+                                </a>
+                            </td>
+                            <td th:text="${doc.drafter?.name}">김철수</td>
+                            <td th:text="${#temporals.format(doc.draftedAt, 'yyyy.MM.dd')}">2025.01.05</td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${doc.urgency?.name() == 'VERY_URGENT' ? 'badge-danger' : 
+                                                      (doc.urgency?.name() == 'URGENT' ? 'badge-warning' : 'badge-secondary')}"
+                                      th:text="${doc.urgency?.description}">보통</span>
+                            </td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${doc.status?.name() == 'APPROVED' ? 'badge-success' :
+                                                      (doc.status?.name() == 'REJECTED' ? 'badge-danger' :
+                                                      (doc.status?.name() == 'PENDING' ? 'badge-warning' : 'badge-secondary'))}"
+                                      th:text="${doc.status?.description}">대기</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/approval/{id}(id=${doc.docId})}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-eye"></i> 보기
+                                </a>
+                            </td>
+                        </tr>
+                        
+                        <!-- 데이터가 없을 때 -->
+                        <tr th:if="${documents == null or documents.isEmpty()}">
+                            <td colspan="9" class="text-center py-4">
+                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">문서가 없습니다</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 페이지네이션 -->
+            <div class="row">
+                <div class="col-sm-12 col-md-5">
+                    <div class="dataTables_info">
+                        전체 <span th:text="${documents != null ? documents.size() : 0}">0</span>건
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-7">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-end">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">이전</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item">
+                                <a class="page-link" href="#">다음</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<th:block layout:fragment="scripts">
+<script>
+// 전체 선택 체크박스
+document.getElementById('checkAll').addEventListener('change', function() {
+    var checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+    checkboxes.forEach(function(checkbox) {
+        checkbox.checked = this.checked;
+    }.bind(this));
+});
+</script>
+</th:block>
+</body>
+</html>
