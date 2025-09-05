@@ -27,7 +27,6 @@
 | ORM | JPA/Hibernate | - | 객체-관계 매핑 |
 | Security | Spring Security | - | 인증/인가 |
 | Token | JWT | - | 토큰 기반 인증 |
-| Cache | Redis | 7.x | 캐싱 및 세션 관리 |
 | Message Queue | RabbitMQ | 3.x | 비동기 메시지 처리 |
 
 ### 2.2 Frontend
@@ -816,7 +815,6 @@ POST   /notifications/settings - 알림 설정
 - Microservice 전환 가능한 구조
 - 모듈별 독립적 배포 가능
 - 수평적 확장 지원 (Scale-out)
-- 캐싱 전략 (Redis)
 
 ### 11.2 유지보수성
 - Clean Code 원칙 준수

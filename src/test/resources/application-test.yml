@@ -18,9 +18,6 @@ spring:
     console:
       enabled: false
   
-  redis:
-    port: 6370
-  
   cache:
     type: none
 

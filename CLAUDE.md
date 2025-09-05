@@ -40,7 +40,7 @@ open build/reports/tests/test/index.html
 
 ### Docker
 ```bash
-# Docker Compose로 전체 스택 실행 (MySQL + Redis + App)
+# Docker Compose로 전체 스택 실행 (MySQL + App)
 docker-compose up -d --build
 
 # 로그 확인
@@ -133,7 +133,6 @@ public class XxxService {
 
 #### Production (MySQL/PostgreSQL)
 - Docker Compose로 MySQL 8.0 제공
-- Redis for 캐싱 및 세션 관리
 
 ### Test Strategy
 
@@ -174,17 +173,10 @@ void createUser_DuplicateEmail_ThrowsException() { }
 
 ### Development Environment Setup Requirements
 1. Java 17+
-2. Redis 서버 (또는 Docker)
-3. MySQL 8.0 (프로덕션) 또는 H2 (개발)
-4. Gradle 8.5
+2. MySQL 8.0 (프로덕션) 또는 H2 (개발)
+3. Gradle 8.5
 
 ### Common Troubleshooting
-
-#### Redis Connection Issues
-개발 환경에서 Redis가 없을 경우:
-```bash
-docker run -d -p 6379:6379 redis:7-alpine
-```
 
 #### Test Failures
 - H2 데이터베이스 설정 확인 (`application-test.yml`)

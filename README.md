@@ -49,7 +49,6 @@ Liteware는 Spring Boot 기반의 현대적인 그룹웨어 시스템입니다. 
 
 - **Backend**: Spring Boot 3.x, Java 17
 - **Database**: MySQL 8.0
-- **Cache**: Redis
 - **Security**: Spring Security, JWT
 - **ORM**: JPA/Hibernate
 - **Build Tool**: Gradle
@@ -61,7 +60,6 @@ Liteware는 Spring Boot 기반의 현대적인 그룹웨어 시스템입니다. 
 
 - Java 17 이상
 - MySQL 8.0 이상
-- Redis 7 이상
 - Docker & Docker Compose (선택사항)
 
 ### 로컬 환경에서 실행하기
@@ -81,13 +79,7 @@ GRANT ALL PRIVILEGES ON liteware.* TO 'liteware'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-#### 3. Redis 실행
-```bash
-#  Docker 사용 권장
-docker run -d -p 6379:6379 redis:7-alpine
-```
-
-#### 4. 애플리케이션 설정
+#### 3. 애플리케이션 설정
 `src/main/resources/application.yml` 파일에서 데이터베이스 연결 정보를 확인/수정합니다:
 ```yaml
 spring:
@@ -97,7 +89,7 @@ spring:
     password: liteware123!
 ```
 
-#### 5. 애플리케이션 실행
+#### 4. 애플리케이션 실행
 ```bash
 # Gradle Wrapper 사용
 ./gradlew bootRun
@@ -111,7 +103,7 @@ java -jar build/libs/liteware-0.0.1-SNAPSHOT.jar
 
 ### Docker Compose로 실행하기
 
-Docker Compose를 사용하면 모든 서비스(MySQL, Redis, 애플리케이션)를 한 번에 실행할 수 있습니다.
+Docker Compose를 사용하면 모든 서비스(MySQL, 애플리케이션)를 한 번에 실행할 수 있습니다.
 
 #### 1. 환경 변수 설정 (선택사항)
 `.env` 파일을 생성하여 JWT 시크릿 키를 설정할 수 있습니다:
@@ -279,7 +271,6 @@ liteware/
 기본 포트가 사용 중인 경우:
 - 애플리케이션: `application.yml`에서 `server.port` 변경
 - MySQL: `docker-compose.yml`에서 포트 매핑 변경
-- Redis: `docker-compose.yml`에서 포트 매핑 변경
 
 ### 데이터베이스 연결 실패
 1. MySQL 서비스가 실행 중인지 확인
