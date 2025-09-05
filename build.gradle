@@ -36,6 +36,7 @@ dependencies {
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
     
     // Database
+    implementation 'com.mysql:mysql-connector-j'
     implementation 'org.postgresql:postgresql'
     implementation 'com.h2database:h2'
     

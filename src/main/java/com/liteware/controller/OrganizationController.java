@@ -1,7 +1,7 @@
 package com.liteware.controller;
 
 import com.liteware.service.user.UserService;
-import com.liteware.service.department.DepartmentService;
+import com.liteware.service.organization.DepartmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
