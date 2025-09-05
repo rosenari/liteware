@@ -83,13 +83,7 @@ FLUSH PRIVILEGES;
 
 #### 3. Redis 실행
 ```bash
-# Mac (Homebrew)
-brew services start redis
-
-# Linux
-sudo systemctl start redis
-
-# Windows (WSL 또는 Docker 사용 권장)
+#  Docker 사용 권장
 docker run -d -p 6379:6379 redis:7-alpine
 ```
 
