@@ -189,7 +189,7 @@ class AuthServiceTest {
         when(userRepository.findByLoginId("testuser")).thenReturn(Optional.of(user));
         when(jwtTokenProvider.createAccessToken("testuser")).thenReturn("new-access-token");
         
-        String newAccessToken = authService.refreshToken(refreshToken);
+        String newAccessToken = authService.refreshToken(refreshToken).getAccessToken();
         
         assertThat(newAccessToken).isEqualTo("new-access-token");
         
