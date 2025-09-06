@@ -1,5 +1,6 @@
 package com.liteware.service.auth;
 
+import com.liteware.model.dto.JwtResponse;
 import com.liteware.model.dto.LoginRequest;
 import com.liteware.model.dto.LoginResponse;
 import com.liteware.model.dto.SignupRequest;
@@ -34,6 +35,89 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    
+    public JwtResponse authenticate(LoginRequest request) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.getUsername() != null ? request.getUsername() : request.getLoginId(),
+                            request.getPassword()
+                    )
+            );
+            
+            String username = request.getUsername() != null ? request.getUsername() : request.getLoginId();
+            User user = userRepository.findByLoginId(username)
+                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+            
+            if (user.getStatus() == UserStatus.SUSPENDED || user.isAccountLocked()) {
+                throw new RuntimeException("계정이 잠겨있습니다. 관리자에게 문의하세요.");
+            }
+            
+            user.resetLoginAttempts();
+            user.setLastLoginAt(LocalDate.now());
+            userRepository.save(user);
+            
+            String accessToken = jwtTokenProvider.createAccessToken(authentication.getName());
+            String refreshToken = jwtTokenProvider.createRefreshToken(authentication.getName());
+            
+            String mainRole = user.getRoles().stream()
+                    .map(Role::getRoleName)
+                    .findFirst()
+                    .orElse("USER");
+            
+            return JwtResponse.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .tokenType("Bearer")
+                    .expiresIn(3600L) // 1 hour in seconds
+                    .username(user.getLoginId())
+                    .email(user.getEmail())
+                    .name(user.getName())
+                    .role(mainRole)
+                    .build();
+                    
+        } catch (AuthenticationException e) {
+            String username = request.getUsername() != null ? request.getUsername() : request.getLoginId();
+            User user = userRepository.findByLoginId(username).orElse(null);
+            if (user != null) {
+                user.incrementLoginAttempts();
+                userRepository.save(user);
+            }
+            throw new BadCredentialsException("Invalid credentials", e);
+        }
+    }
+    
+    public JwtResponse refreshToken(String refreshToken) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            throw new RuntimeException("유효하지 않은 Refresh Token입니다");
+        }
+        
+        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+        User user = userRepository.findByLoginId(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new RuntimeException("비활성화된 계정입니다");
+        }
+        
+        String newAccessToken = jwtTokenProvider.createAccessToken(username);
+        
+        String mainRole = user.getRoles().stream()
+                .map(Role::getRoleName)
+                .findFirst()
+                .orElse("USER");
+        
+        return JwtResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(refreshToken) // Keep the same refresh token
+                .tokenType("Bearer")
+                .expiresIn(3600L)
+                .username(user.getLoginId())
+                .email(user.getEmail())
+                .name(user.getName())
+                .role(mainRole)
+                .build();
+    }
     
     public LoginResponse login(LoginRequest request) {
         try {
@@ -119,22 +203,6 @@ public class AuthService {
         user.setPasswordChangedAt(LocalDate.now());
         
         return userRepository.save(user);
-    }
-    
-    public String refreshToken(String refreshToken) {
-        if (!jwtTokenProvider.validateToken(refreshToken)) {
-            throw new RuntimeException("유효하지 않은 Refresh Token입니다");
-        }
-        
-        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
-        User user = userRepository.findByLoginId(username)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
-        
-        if (user.getStatus() != UserStatus.ACTIVE) {
-            throw new RuntimeException("비활성화된 계정입니다");
-        }
-        
-        return jwtTokenProvider.createAccessToken(username);
     }
     
     public void changePassword(Long userId, String oldPassword, String newPassword) {

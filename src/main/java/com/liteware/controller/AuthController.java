@@ -1,8 +1,10 @@
 package com.liteware.controller;
 
+import com.liteware.model.dto.JwtResponse;
 import com.liteware.model.dto.LoginRequest;
 import com.liteware.model.dto.SignupRequest;
 import com.liteware.service.auth.AuthService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -37,6 +39,45 @@ public class AuthController {
         return "auth/login";
     }
     
+    @PostMapping("/login")
+    public String login(@RequestParam String username,
+                       @RequestParam String password,
+                       @RequestParam(value = "remember-me", required = false) String rememberMe,
+                       HttpServletResponse response,
+                       RedirectAttributes redirectAttributes) {
+        try {
+            LoginRequest loginRequest = new LoginRequest();
+            loginRequest.setUsername(username);
+            loginRequest.setPassword(password);
+            
+            JwtResponse jwtResponse = authService.authenticate(loginRequest);
+            
+            // Set JWT cookie
+            Cookie jwtCookie = new Cookie("jwt", jwtResponse.getAccessToken());
+            jwtCookie.setHttpOnly(true);
+            jwtCookie.setSecure(false); // Set to true in production with HTTPS
+            jwtCookie.setPath("/");
+            jwtCookie.setMaxAge(rememberMe != null ? 7 * 24 * 60 * 60 : 60 * 60); // 7 days if remember-me, else 1 hour
+            response.addCookie(jwtCookie);
+            
+            // Set refresh token cookie
+            if (jwtResponse.getRefreshToken() != null) {
+                Cookie refreshCookie = new Cookie("refreshToken", jwtResponse.getRefreshToken());
+                refreshCookie.setHttpOnly(true);
+                refreshCookie.setSecure(false); // Set to true in production with HTTPS
+                refreshCookie.setPath("/");
+                refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+                response.addCookie(refreshCookie);
+            }
+            
+            return "redirect:/dashboard";
+        } catch (Exception e) {
+            log.error("Login error", e);
+            redirectAttributes.addFlashAttribute("error", "아이디 또는 비밀번호가 올바르지 않습니다.");
+            return "redirect:/login?error";
+        }
+    }
+    
     @GetMapping("/signup")
     public String signupPage(Model model) {
         model.addAttribute("signupRequest", new SignupRequest());
@@ -69,6 +110,23 @@ public class AuthController {
         if (auth != null) {
             new SecurityContextLogoutHandler().logout(request, response, auth);
         }
+        
+        // Clear JWT cookie
+        Cookie jwtCookie = new Cookie("jwt", "");
+        jwtCookie.setHttpOnly(true);
+        jwtCookie.setSecure(false);
+        jwtCookie.setPath("/");
+        jwtCookie.setMaxAge(0);
+        response.addCookie(jwtCookie);
+        
+        // Clear refresh token cookie
+        Cookie refreshCookie = new Cookie("refreshToken", "");
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(false);
+        refreshCookie.setPath("/");
+        refreshCookie.setMaxAge(0);
+        response.addCookie(refreshCookie);
+        
         return "redirect:/login?logout";
     }
     

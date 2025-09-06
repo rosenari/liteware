@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>회원가입 | Liteware</title>
+    
+    <!-- Google Font -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- AdminLTE -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/css/adminlte.min.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .register-box {
+            width: 450px;
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        .register-logo {
+            font-size: 2.5rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+    </style>
+</head>
+<body class="hold-transition register-page">
+<div class="register-box">
+    <div class="register-logo">
+        <b>LITEWARE</b>
+    </div>
+    
+    <div class="card">
+        <div class="card-body register-card-body">
+            <p class="login-box-msg">새로운 계정을 등록합니다</p>
+            
+            <!-- 오류 메시지 -->
+            <form th:action="@{/signup}" th:object="${signupRequest}" method="post">
+                <div class="input-group mb-3">
+                    <input type="text" th:field="*{loginId}" class="form-control" placeholder="아이디" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user"></span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('loginId')}" class="text-danger small" th:errors="*{loginId}"></div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="text" th:field="*{name}" class="form-control" placeholder="이름" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-user-circle"></span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('name')}" class="text-danger small" th:errors="*{name}"></div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="email" th:field="*{email}" class="form-control" placeholder="이메일" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-envelope"></span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('email')}" class="text-danger small" th:errors="*{email}"></div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="tel" th:field="*{phone}" class="form-control" placeholder="전화번호">
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-phone"></span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('phone')}" class="text-danger small" th:errors="*{phone}"></div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="password" th:field="*{password}" class="form-control" placeholder="비밀번호" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('password')}" class="text-danger small" th:errors="*{password}"></div>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <input type="password" th:field="*{passwordConfirm}" class="form-control" placeholder="비밀번호 확인" required>
+                    <div class="input-group-append">
+                        <div class="input-group-text">
+                            <span class="fas fa-lock"></span>
+                        </div>
+                    </div>
+                    <div th:if="${#fields.hasErrors('passwordConfirm')}" class="text-danger small" th:errors="*{passwordConfirm}"></div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="agreeTerms" name="terms" value="agree" required>
+                            <label for="agreeTerms">
+                                <a href="#">이용약관</a>에 동의합니다
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <button type="submit" class="btn btn-primary btn-block">회원가입</button>
+                    </div>
+                </div>
+            </form>
+            
+            <hr>
+            
+            <p class="mb-0">
+                이미 계정이 있으신가요? <a href="/login" class="text-center">로그인</a>
+            </p>
+        </div>
+    </div>
+    
+    <div class="text-center mt-3">
+        <p class="text-white">
+            &copy; 2025 Liteware. All rights reserved.
+        </p>
+    </div>
+</div>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2.0/dist/js/adminlte.min.js"></script>
+</body>
+</html>

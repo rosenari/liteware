@@ -10,8 +10,9 @@ import lombok.*;
 @AllArgsConstructor
 public class LoginRequest {
     
-    @NotBlank(message = "로그인 ID를 입력해주세요")
     private String loginId;
+    
+    private String username; // Alternative field for login ID
     
     @NotBlank(message = "비밀번호를 입력해주세요")
     private String password;
