@@ -55,7 +55,7 @@
                 <div class="col-lg-3 col-6">
                     <div class="small-box bg-warning">
                         <div class="inner">
-                            <h3>2</h3>
+                            <h3 th:text="${inactiveUsers}">0</h3>
                             <p>비활성 사용자</p>
                         </div>
                         <div class="icon">
@@ -66,7 +66,7 @@
                 <div class="col-lg-3 col-6">
                     <div class="small-box bg-danger">
                         <div class="inner">
-                            <h3>1</h3>
+                            <h3 th:text="${adminUsers}">0</h3>
                             <p>관리자</p>
                         </div>
                         <div class="icon">
@@ -107,8 +107,8 @@
                                 <td th:text="${user.loginId}">admin</td>
                                 <td th:text="${user.name}">관리자</td>
                                 <td th:text="${user.email}">admin@liteware.com</td>
-                                <td th:text="${user.department?.name}">개발부</td>
-                                <td th:text="${user.position?.name}">과장</td>
+                                <td th:text="${user.department?.deptName}">개발부</td>
+                                <td th:text="${user.position?.positionName}">과장</td>
                                 <td>
                                     <span class="badge badge-danger" th:if="${user.loginId == 'admin'}">관리자</span>
                                     <span class="badge badge-info" th:unless="${user.loginId == 'admin'}">일반</span>
@@ -118,13 +118,13 @@
                                     <span class="badge badge-warning" th:unless="${user.status?.name() == 'ACTIVE'}">비활성</span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-xs btn-info" onclick="editUser([[${user.userId}]])">
+                                    <button class="btn btn-xs btn-info" th:onclick="|editUser(${user.userId})|">
                                         <i class="fas fa-edit"></i>
                                     </button>
-                                    <button class="btn btn-xs btn-warning" onclick="toggleUserStatus([[${user.userId}]])">
+                                    <button class="btn btn-xs btn-warning" th:onclick="|toggleUserStatus(${user.userId})|">
                                         <i class="fas fa-power-off"></i>
                                     </button>
-                                    <button class="btn btn-xs btn-danger" onclick="deleteUser([[${user.userId}]])">
+                                    <button class="btn btn-xs btn-danger" th:onclick="|deleteUser(${user.userId})|">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -135,13 +135,256 @@
             </div>
         </div>
     </section>
+    
+    <!-- 새 사용자 추가 모달 -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">새 사용자 추가</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form id="addUserForm">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="loginId">사용자ID *</label>
+                                    <input type="text" class="form-control" id="loginId" name="loginId" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="name">이름 *</label>
+                                    <input type="text" class="form-control" id="name" name="name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="email">이메일 *</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="phoneNumber">전화번호</label>
+                                    <input type="text" class="form-control" id="phoneNumber" name="phoneNumber">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="password">비밀번호 *</label>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="confirmPassword">비밀번호 확인 *</label>
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="departmentId">부서</label>
+                                    <select class="form-control" id="departmentId" name="departmentId">
+                                        <option value="">부서 선택</option>
+                                        <option th:each="dept : ${departments}" th:value="${dept.deptId}" th:text="${dept.deptName}">개발부</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="positionId">직급</label>
+                                    <select class="form-control" id="positionId" name="positionId">
+                                        <option value="">직급 선택</option>
+                                        <option th:each="pos : ${positions}" th:value="${pos.positionId}" th:text="${pos.positionName}">과장</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary">저장</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 사용자 수정 모달 -->
+    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">사용자 수정</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <form id="editUserForm">
+                    <input type="hidden" id="editUserId" name="userId">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editLoginId">사용자ID</label>
+                                    <input type="text" class="form-control" id="editLoginId" name="loginId" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editName">이름 *</label>
+                                    <input type="text" class="form-control" id="editName" name="name" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editEmail">이메일 *</label>
+                                    <input type="email" class="form-control" id="editEmail" name="email" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPhoneNumber">전화번호</label>
+                                    <input type="text" class="form-control" id="editPhoneNumber" name="phoneNumber">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editDepartmentId">부서</label>
+                                    <select class="form-control" id="editDepartmentId" name="departmentId">
+                                        <option value="">부서 선택</option>
+                                        <option th:each="dept : ${departments}" th:value="${dept.deptId}" th:text="${dept.deptName}">개발부</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="editPositionId">직급</label>
+                                    <select class="form-control" id="editPositionId" name="positionId">
+                                        <option value="">직급 선택</option>
+                                        <option th:each="pos : ${positions}" th:value="${pos.positionId}" th:text="${pos.positionName}">과장</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                        <button type="submit" class="btn btn-primary">수정</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <th:block layout:fragment="scripts">
 <script>
+$(document).ready(function() {
+    // 새 사용자 추가 폼 제출
+    $('#addUserForm').submit(function(e) {
+        e.preventDefault();
+        
+        var password = $('#password').val();
+        var confirmPassword = $('#confirmPassword').val();
+        
+        if (password !== confirmPassword) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+        
+        var formData = {
+            loginId: $('#loginId').val(),
+            name: $('#name').val(),
+            email: $('#email').val(),
+            phoneNumber: $('#phoneNumber').val(),
+            password: password,
+            departmentId: $('#departmentId').val() || null,
+            positionId: $('#positionId').val() || null
+        };
+        
+        $.ajax({
+            url: '/admin/users',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(result) {
+                if (result === 'success') {
+                    $('#addUserModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert('사용자 추가에 실패했습니다.');
+                }
+            },
+            error: function(xhr) {
+                var error = xhr.responseText || '사용자 추가에 실패했습니다.';
+                alert(error);
+            }
+        });
+    });
+    
+    // 사용자 수정 폼 제출
+    $('#editUserForm').submit(function(e) {
+        e.preventDefault();
+        
+        var userId = $('#editUserId').val();
+        var formData = {
+            name: $('#editName').val(),
+            email: $('#editEmail').val(),
+            phoneNumber: $('#editPhoneNumber').val(),
+            departmentId: $('#editDepartmentId').val() || null,
+            positionId: $('#editPositionId').val() || null
+        };
+        
+        $.ajax({
+            url: '/admin/users/' + userId,
+            type: 'PUT',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(result) {
+                if (result === 'success') {
+                    $('#editUserModal').modal('hide');
+                    location.reload();
+                } else {
+                    alert('사용자 수정에 실패했습니다.');
+                }
+            },
+            error: function(xhr) {
+                var error = xhr.responseText || '사용자 수정에 실패했습니다.';
+                alert(error);
+            }
+        });
+    });
+});
+
 function editUser(userId) {
-    // 사용자 수정 로직
-    alert('사용자 수정: ' + userId);
+    // 사용자 정보 로드 후 모달 표시
+    $.get('/admin/users/' + userId, function(user) {
+        $('#editUserId').val(user.userId);
+        $('#editLoginId').val(user.loginId);
+        $('#editName').val(user.name);
+        $('#editEmail').val(user.email);
+        $('#editPhoneNumber').val(user.phoneNumber);
+        $('#editDepartmentId').val(user.departmentId);
+        $('#editPositionId').val(user.positionId);
+        $('#editUserModal').modal('show');
+    }).fail(function() {
+        alert('사용자 정보를 불러올 수 없습니다.');
+    });
 }
 
 function toggleUserStatus(userId) {
@@ -149,15 +392,31 @@ function toggleUserStatus(userId) {
         $.post('/admin/users/' + userId + '/toggle', function(result) {
             if (result === 'success') {
                 location.reload();
+            } else {
+                alert('상태 변경에 실패했습니다.');
             }
+        }).fail(function() {
+            alert('상태 변경에 실패했습니다.');
         });
     }
 }
 
 function deleteUser(userId) {
     if (confirm('정말 삭제하시겠습니까?')) {
-        // 사용자 삭제 로직
-        alert('사용자 삭제: ' + userId);
+        $.ajax({
+            url: '/admin/users/' + userId,
+            type: 'DELETE',
+            success: function(result) {
+                if (result === 'success') {
+                    location.reload();
+                } else {
+                    alert('사용자 삭제에 실패했습니다.');
+                }
+            },
+            error: function() {
+                alert('사용자 삭제에 실패했습니다.');
+            }
+        });
     }
 }
 </script>

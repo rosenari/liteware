@@ -78,112 +78,19 @@
             </div>
         </div>
         
-        <!-- 오늘의 일정 -->
+        <!-- 전체 사용자 -->
         <div class="col-lg-3 col-6">
             <div class="small-box bg-danger">
                 <div class="inner">
-                    <h3>3</h3>
-                    <p>오늘의 일정</p>
+                    <h3 th:text="${totalUsers != null ? totalUsers : 0}">0</h3>
+                    <p>전체 사용자</p>
                 </div>
                 <div class="icon">
-                    <i class="fas fa-calendar-check"></i>
+                    <i class="fas fa-users"></i>
                 </div>
-                <a href="/calendar" class="small-box-footer">
+                <a href="/admin/users" class="small-box-footer">
                     자세히 보기 <i class="fas fa-arrow-circle-right"></i>
                 </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <!-- 최근 결재 문서 -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-file-signature mr-1"></i>
-                        최근 결재 문서
-                    </h3>
-                    <div class="card-tools">
-                        <a href="/approval" class="btn btn-tool btn-sm">
-                            <i class="fas fa-plus"></i> 더보기
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th style="width: 10px">#</th>
-                                <th>문서명</th>
-                                <th>기안자</th>
-                                <th style="width: 80px">상태</th>
-                                <th style="width: 100px">작성일</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="doc, iter : ${recentDocuments}" th:if="${iter.index < 5}">
-                                <td th:text="${iter.count} + '.'">1.</td>
-                                <td>
-                                    <a th:href="@{/approval/{id}(id=${doc.docId})}" th:text="${doc.title}">문서 제목</a>
-                                </td>
-                                <td th:text="${doc.drafter?.name}">기안자</td>
-                                <td>
-                                    <span class="badge" 
-                                          th:classappend="${doc.status.name() == 'PENDING' ? 'badge-warning' : (doc.status.name() == 'APPROVED' ? 'badge-success' : (doc.status.name() == 'REJECTED' ? 'badge-danger' : 'badge-secondary'))}"
-                                          th:text="${doc.status.description}">상태</span>
-                                </td>
-                                <td th:text="${#temporals.format(doc.createdAt, 'yyyy.MM.dd')}">작성일</td>
-                            </tr>
-                            <tr th:if="${recentDocuments == null or recentDocuments.empty}">
-                                <td colspan="5" class="text-center text-muted">최근 결재 문서가 없습니다.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 공지사항 -->
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-bullhorn mr-1"></i>
-                        공지사항
-                    </h3>
-                    <div class="card-tools">
-                        <a href="/board/1" class="btn btn-tool btn-sm">
-                            <i class="fas fa-plus"></i> 더보기
-                        </a>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-sm">
-                        <thead>
-                            <tr>
-                                <th style="width: 10px">#</th>
-                                <th>제목</th>
-                                <th>작성자</th>
-                                <th style="width: 100px">작성일</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="notice, iter : ${notices}" th:if="${iter.index < 5}">
-                                <td th:text="${notice.isPinned ? '📌' : (iter.count + '.')}">1.</td>
-                                <td>
-                                    <a th:href="@{/board/{boardId}/post/{postId}(boardId=${notice.board?.boardId}, postId=${notice.postId})}" 
-                                       th:text="${notice.title}">제목</a>
-                                </td>
-                                <td th:text="${notice.writer?.name}">작성자</td>
-                                <td th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}">작성일</td>
-                            </tr>
-                            <tr th:if="${notices == null or notices.empty}">
-                                <td colspan="4" class="text-center text-muted">공지사항이 없습니다.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
@@ -213,13 +120,13 @@
                     <div class="row">
                         <div class="col-6">
                             <div class="description-block border-right">
-                                <h5 class="description-header">15일</h5>
+                                <h5 class="description-header" th:text="${remainingVacation != null ? remainingVacation + '일' : '0일'}">0일</h5>
                                 <span class="description-text">잔여 연차</span>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="description-block">
-                                <h5 class="description-header">2일</h5>
+                                <h5 class="description-header" th:text="${monthlyUsedVacation != null ? monthlyUsedVacation + '일' : '0일'}">0일</h5>
                                 <span class="description-text">이번달 사용</span>
                             </div>
                         </div>
@@ -231,105 +138,153 @@
             </div>
         </div>
         
-        <!-- 빠른 메뉴 -->
+        <!-- 최근 결재 문서 -->
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-rocket mr-1"></i>
-                        빠른 메뉴
+                        <i class="fas fa-file-signature mr-1"></i>
+                        최근 결재 문서
                     </h3>
+                    <div class="card-tools">
+                        <a href="/approval" class="btn btn-tool btn-sm">
+                            <i class="fas fa-plus"></i> 더보기
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6 mb-2">
-                            <a href="/approval/draft" class="btn btn-app bg-info w-100">
-                                <i class="fas fa-edit"></i> 기안 작성
-                            </a>
-                        </div>
-                        <div class="col-6 mb-2">
-                            <a href="/board/2/write" class="btn btn-app bg-success w-100">
-                                <i class="fas fa-pen"></i> 게시글 작성
-                            </a>
-                        </div>
-                        <div class="col-6 mb-2">
-                            <a href="/organization" class="btn btn-app bg-warning w-100">
-                                <i class="fas fa-sitemap"></i> 조직도
-                            </a>
-                        </div>
-                        <div class="col-6 mb-2">
-                            <a href="/calendar" class="btn btn-app bg-danger w-100">
-                                <i class="fas fa-calendar"></i> 일정 관리
-                            </a>
-                        </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 300px;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>문서명</th>
+                                    <th style="width: 80px">상태</th>
+                                    <th style="width: 80px">작성일</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="doc, iter : ${recentDocuments}" th:if="${iter.index < 5}">
+                                    <td th:text="${iter.count} + '.'">1.</td>
+                                    <td>
+                                        <a th:href="@{/approval/{id}(id=${doc.docId})}" 
+                                           th:text="${doc.title.length() > 15 ? doc.title.substring(0, 15) + '...' : doc.title}" 
+                                           th:title="${doc.title}">문서 제목</a>
+                                        <small class="text-muted d-block" th:text="${doc.drafter?.name}">기안자</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-sm" 
+                                              th:classappend="${doc.status.name() == 'PENDING' ? 'badge-warning' : (doc.status.name() == 'APPROVED' ? 'badge-success' : (doc.status.name() == 'REJECTED' ? 'badge-danger' : 'badge-secondary'))}"
+                                              th:text="${doc.status.description}">상태</span>
+                                    </td>
+                                    <td class="text-xs" th:text="${#temporals.format(doc.createdAt, 'MM.dd')}">작성일</td>
+                                </tr>
+                                <tr th:if="${recentDocuments == null or recentDocuments.empty}">
+                                    <td colspan="4" class="text-center text-muted py-3">최근 결재 문서가 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- 부서 소식 -->
+        <!-- 공지사항 -->
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-users mr-1"></i>
-                        우리 부서 소식
+                        <i class="fas fa-bullhorn mr-1"></i>
+                        공지사항
                     </h3>
+                    <div class="card-tools">
+                        <a href="/board/1" class="btn btn-tool btn-sm">
+                            <i class="fas fa-plus"></i> 더보기
+                        </a>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="direct-chat-messages" style="height: 250px;">
-                        <div class="direct-chat-msg">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-left">김과장</span>
-                                <span class="direct-chat-timestamp float-right">오늘 09:30</span>
-                            </div>
-                            <img class="direct-chat-img" src="https://via.placeholder.com/40" alt="User">
-                            <div class="direct-chat-text">
-                                오늘 오후 3시 팀 미팅 있습니다!
-                            </div>
-                        </div>
-                        <div class="direct-chat-msg right">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name float-right">이대리</span>
-                                <span class="direct-chat-timestamp float-left">오늘 10:15</span>
-                            </div>
-                            <img class="direct-chat-img" src="https://via.placeholder.com/40" alt="User">
-                            <div class="direct-chat-text">
-                                프로젝트 진행 상황 공유드립니다.
-                            </div>
-                        </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive" style="max-height: 300px;">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th style="width: 10px">#</th>
+                                    <th>제목</th>
+                                    <th style="width: 60px">작성자</th>
+                                    <th style="width: 80px">작성일</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="notice, iter : ${notices}" th:if="${iter.index < 5}">
+                                    <td th:text="${notice.isPinned ? '📌' : (iter.count + '.')}">1.</td>
+                                    <td>
+                                        <a th:href="@{/board/{boardId}/post/{postId}(boardId=${notice.board?.boardId}, postId=${notice.postId})}" 
+                                           th:text="${notice.title.length() > 15 ? notice.title.substring(0, 15) + '...' : notice.title}"
+                                           th:title="${notice.title}">제목</a>
+                                    </td>
+                                    <td class="text-xs" th:text="${notice.writer?.name}">작성자</td>
+                                    <td class="text-xs" th:text="${#temporals.format(notice.createdAt, 'MM.dd')}">작성일</td>
+                                </tr>
+                                <tr th:if="${notices == null or notices.empty}">
+                                    <td colspan="4" class="text-center text-muted py-3">공지사항이 없습니다.</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     
-    <!-- 차트 영역 -->
+    <!-- 시스템 현황 -->
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-chart-bar mr-1"></i>
-                        월별 결재 현황
+                        <i class="fas fa-info-circle mr-1"></i>
+                        시스템 현황
                     </h3>
                 </div>
                 <div class="card-body">
-                    <canvas id="approvalChart" style="height: 300px;"></canvas>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie mr-1"></i>
-                        문서 유형별 통계
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <canvas id="documentTypeChart" style="height: 300px;"></canvas>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-info"><i class="fas fa-database"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">전체 게시글</span>
+                                    <span class="info-box-number" th:text="${totalPosts != null ? totalPosts : 0}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-success"><i class="fas fa-check"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">완료 결재</span>
+                                    <span class="info-box-number" th:text="${completedApprovals != null ? completedApprovals : 0}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-warning"><i class="fas fa-users"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">활성 사용자</span>
+                                    <span class="info-box-number" th:text="${activeUsersCount != null ? activeUsersCount : 0}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="info-box">
+                                <span class="info-box-icon bg-danger"><i class="fas fa-building"></i></span>
+                                <div class="info-box-content">
+                                    <span class="info-box-text">전체 부서</span>
+                                    <span class="info-box-number" th:text="${totalDepartments != null ? totalDepartments : 0}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -339,63 +294,5 @@
     </section>
 </div>
 
-<th:block layout:fragment="scripts">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-// 월별 결재 현황 차트
-const approvalCtx = document.getElementById('approvalChart').getContext('2d');
-new Chart(approvalCtx, {
-    type: 'bar',
-    data: {
-        labels: ['7월', '8월', '9월', '10월', '11월', '12월'],
-        datasets: [{
-            label: '승인',
-            data: [12, 19, 15, 25, 22, 30],
-            backgroundColor: 'rgba(40, 167, 69, 0.8)'
-        }, {
-            label: '반려',
-            data: [3, 2, 5, 3, 4, 2],
-            backgroundColor: 'rgba(220, 53, 69, 0.8)'
-        }, {
-            label: '대기',
-            data: [5, 8, 4, 7, 6, 9],
-            backgroundColor: 'rgba(255, 193, 7, 0.8)'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
-});
-
-// 문서 유형별 통계 차트
-const docTypeCtx = document.getElementById('documentTypeChart').getContext('2d');
-new Chart(docTypeCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['휴가신청', '경비청구', '구매요청', '출장신청', '기타'],
-        datasets: [{
-            data: [30, 25, 20, 15, 10],
-            backgroundColor: [
-                'rgba(54, 162, 235, 0.8)',
-                'rgba(255, 99, 132, 0.8)',
-                'rgba(255, 206, 86, 0.8)',
-                'rgba(75, 192, 192, 0.8)',
-                'rgba(153, 102, 255, 0.8)'
-            ]
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false
-    }
-});
-</script>
-</th:block>
 </body>
 </html>

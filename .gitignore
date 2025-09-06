@@ -10,6 +10,7 @@
 .claude/
 .mcp.json
 .playwright-mcp/
+cookies.txt
 
 # Gradle
 .gradle/

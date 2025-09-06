@@ -31,6 +31,7 @@ spring:
     restart:
       enabled: true
       additional-exclude: static/**
+      additional-paths: templates/**
   
   thymeleaf:
     cache: false
@@ -77,7 +78,7 @@ logging:
     name: logs/liteware.log
 
 jwt:
-  secret: ${JWT_SECRET:mySecretKeyForJWTTokenGenerationAndValidationInLitewareApplication2025}
+  secret: secret_key_jslim_20250905_liteware_256_long
   expiration: 3600000
   refresh-expiration: 604800000
 

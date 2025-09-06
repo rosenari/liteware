@@ -62,4 +62,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
     
     @Query("SELECT u FROM User u LEFT JOIN FETCH u.department LEFT JOIN FETCH u.position")
     List<User> findAllWithDepartmentAndPosition();
+    
+    @Query("SELECT DISTINCT u FROM User u " +
+           "LEFT JOIN FETCH u.department " +
+           "LEFT JOIN FETCH u.position " +
+           "LEFT JOIN FETCH u.roles " +
+           "WHERE u.isDeleted = false")
+    List<User> findAllWithFullInfo();
 }

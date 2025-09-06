@@ -26,11 +26,11 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     
     /**
-     * 모든 사용자 조회
+     * 모든 사용자 조회 (부서, 직급, 권한 정보 포함)
      */
     @Transactional(readOnly = true)
     public List<User> getAllUsers() {
-        return userRepository.findAllWithDepartmentAndPosition();
+        return userRepository.findAllWithFullInfo();
     }
     
     /**
@@ -115,5 +115,84 @@ public class UserService {
      */
     public List<Position> getAllPositions() {
         return positionRepository.findAll();
+    }
+    
+    /**
+     * 새 사용자 생성
+     */
+    @Transactional
+    public User createUser(UserDto userDto) {
+        // 중복 체크
+        if (userRepository.findByLoginId(userDto.getLoginId()).isPresent()) {
+            throw new RuntimeException("이미 존재하는 사용자ID입니다: " + userDto.getLoginId());
+        }
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
+            throw new RuntimeException("이미 존재하는 이메일입니다: " + userDto.getEmail());
+        }
+        
+        User user = User.builder()
+                .loginId(userDto.getLoginId())
+                .password(passwordEncoder.encode(userDto.getPassword()))
+                .name(userDto.getName())
+                .email(userDto.getEmail())
+                .phone(userDto.getPhoneNumber())
+                .status(com.liteware.model.entity.UserStatus.ACTIVE)
+                .build();
+        
+        // 부서 설정
+        if (userDto.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(userDto.getDepartmentId())
+                    .orElseThrow(() -> new RuntimeException("Department not found"));
+            user.setDepartment(department);
+        }
+        
+        // 직급 설정
+        if (userDto.getPositionId() != null) {
+            Position position = positionRepository.findById(userDto.getPositionId())
+                    .orElseThrow(() -> new RuntimeException("Position not found"));
+            user.setPosition(position);
+        }
+        
+        return userRepository.save(user);
+    }
+    
+    /**
+     * 사용자 삭제
+     */
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = getUserById(userId);
+        userRepository.delete(user);
+    }
+    
+    /**
+     * 사용자 상태 토글
+     */
+    @Transactional
+    public void toggleUserStatus(Long userId) {
+        User user = getUserById(userId);
+        if (user.getStatus() == com.liteware.model.entity.UserStatus.ACTIVE) {
+            user.setStatus(com.liteware.model.entity.UserStatus.INACTIVE);
+        } else {
+            user.setStatus(com.liteware.model.entity.UserStatus.ACTIVE);
+        }
+        userRepository.save(user);
+    }
+    
+    /**
+     * 사용자 정보를 DTO로 반환
+     */
+    public UserDto getUserDto(Long userId) {
+        User user = getUserById(userId);
+        UserDto dto = new UserDto();
+        dto.setUserId(user.getUserId());
+        dto.setLoginId(user.getLoginId());
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPhoneNumber(user.getPhoneNumber());
+        dto.setDepartmentId(user.getDepartment() != null ? user.getDepartment().getDeptId() : null);
+        dto.setPositionId(user.getPosition() != null ? user.getPosition().getPositionId() : null);
+        dto.setStatus(user.getStatus().name());
+        return dto;
     }
 }
