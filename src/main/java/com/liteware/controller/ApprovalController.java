@@ -28,7 +28,7 @@ public class ApprovalController {
     private final ApprovalService approvalService;
     private final DepartmentService departmentService;
     
-    @GetMapping
+    @GetMapping({"", "/list"})
     public String list(@RequestParam(defaultValue = "pending") String type,
                        @AuthenticationPrincipal UserDetails userDetails,
                        Model model) {
@@ -70,12 +70,28 @@ public class ApprovalController {
     }
     
     @PostMapping("/draft")
-    public String draft(@ModelAttribute ApprovalDocumentDto documentDto,
+    public String draft(@ModelAttribute("documentDto") ApprovalDocumentDto documentDto,
                        @RequestParam(required = false) List<Long> approverIds,
+                       @RequestParam(required = false) String startTime,
+                       @RequestParam(required = false) String endTime,
+                       @RequestParam(required = false, defaultValue = "false") Boolean isHourlyLeave,
+                       @RequestParam(value = "attachments", required = false) List<org.springframework.web.multipart.MultipartFile> files,
                        @AuthenticationPrincipal UserDetails userDetails,
                        RedirectAttributes redirectAttributes) {
         try {
             documentDto.setDrafterId(1L); // TODO: Get from userDetails
+            
+            // 휴가 신청서인 경우 추가 데이터 처리
+            if (documentDto.getDocType() == DocumentType.LEAVE_REQUEST) {
+                java.util.Map<String, Object> leaveData = new java.util.HashMap<>();
+                leaveData.put("startTime", startTime);
+                leaveData.put("endTime", endTime);
+                leaveData.put("isHourlyLeave", isHourlyLeave);
+                
+                // formData에 JSON 형태로 저장
+                documentDto.setFormData(new com.fasterxml.jackson.databind.ObjectMapper()
+                        .writeValueAsString(leaveData));
+            }
             
             ApprovalDocument document = approvalService.draftDocument(documentDto);
             
@@ -92,8 +108,14 @@ public class ApprovalController {
                 approvalService.setApprovalLine(document.getDocId(), lines);
             }
             
+            // 첨부파일 처리 (추후 구현)
+            if (files != null && !files.isEmpty()) {
+                // TODO: 파일 저장 및 연결 로직 구현
+                log.info("Attachments received: {} files", files.size());
+            }
+            
             redirectAttributes.addFlashAttribute("success", "문서가 저장되었습니다.");
-            return "redirect:/approval/" + document.getDocId();
+            return "redirect:/approval/view/" + document.getDocId();
             
         } catch (Exception e) {
             log.error("Document draft error", e);
@@ -102,7 +124,7 @@ public class ApprovalController {
         }
     }
     
-    @GetMapping("/{id}")
+    @GetMapping("/view/{id}")
     public String view(@PathVariable Long id,
                       @AuthenticationPrincipal UserDetails userDetails,
                       Model model) {
@@ -118,7 +140,7 @@ public class ApprovalController {
         }
     }
     
-    @PostMapping("/{id}/submit")
+    @PostMapping("/view/{id}/submit")
     public String submit(@PathVariable Long id,
                         RedirectAttributes redirectAttributes) {
         try {
@@ -129,10 +151,10 @@ public class ApprovalController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
-        return "redirect:/approval/" + id;
+        return "redirect:/approval/view/" + id;
     }
     
-    @PostMapping("/{id}/approve")
+    @PostMapping("/view/{id}/approve")
     public String approve(@PathVariable Long id,
                          @RequestParam(required = false) String comment,
                          @AuthenticationPrincipal UserDetails userDetails,
@@ -146,10 +168,10 @@ public class ApprovalController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
-        return "redirect:/approval/" + id;
+        return "redirect:/approval/view/" + id;
     }
     
-    @PostMapping("/{id}/reject")
+    @PostMapping("/view/{id}/reject")
     public String reject(@PathVariable Long id,
                         @RequestParam String reason,
                         @AuthenticationPrincipal UserDetails userDetails,
@@ -163,7 +185,7 @@ public class ApprovalController {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
         
-        return "redirect:/approval/" + id;
+        return "redirect:/approval/view/" + id;
     }
     
     @PostMapping("/{id}/cancel")

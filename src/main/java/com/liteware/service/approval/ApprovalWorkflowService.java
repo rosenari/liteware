@@ -1,6 +1,10 @@
 package com.liteware.service.approval;
 
 import com.liteware.model.entity.approval.ApprovalDocument;
+import com.liteware.model.entity.approval.DocumentStatus;
+import com.liteware.model.entity.approval.DocumentType;
+import com.liteware.model.entity.approval.LeaveRequest;
+import com.liteware.service.leave.AnnualLeaveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional
 public class ApprovalWorkflowService {
+    
+    private final AnnualLeaveService annualLeaveService;
     
     public void onDocumentApproved(ApprovalDocument document) {
         log.info("Processing approved document: {}", document.getDocNumber());
@@ -36,14 +42,45 @@ public class ApprovalWorkflowService {
     public void onDocumentRejected(ApprovalDocument document, String reason) {
         log.info("Processing rejected document: {} - Reason: {}", document.getDocNumber(), reason);
         
-        // 반려 시 처리 로직
+        // 휴가 신청이 반려된 경우 연차 복원
+        if (document.getDocType() == DocumentType.LEAVE_REQUEST) {
+            processRejectedLeaveRequest(document, reason);
+        }
+        
+        // 기타 반려 시 처리 로직
         // 예: 알림 발송, 상태 업데이트 등
+    }
+    
+    private void processRejectedLeaveRequest(ApprovalDocument document, String reason) {
+        try {
+            LeaveRequest leaveRequest = document.getLeaveRequest();
+            if (leaveRequest != null && leaveRequest.getLeaveType() == LeaveRequest.LeaveType.ANNUAL) {
+                // 연차 복원 (이미 차감했던 경우만)
+                if (document.getStatus() == DocumentStatus.REJECTED) {
+                    annualLeaveService.restoreAnnualLeave(leaveRequest);
+                    log.info("Annual leave restored for rejected leave request: {}", document.getDocNumber());
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error processing rejected leave request: {}", document.getDocNumber(), e);
+        }
     }
     
     private void processLeaveRequest(ApprovalDocument document) {
         log.info("Processing leave request: {}", document.getDocNumber());
-        // 휴가 신청 승인 후처리
-        // 예: 휴가 일수 차감, 캘린더 업데이트 등
+        
+        try {
+            // LeaveRequest 조회
+            LeaveRequest leaveRequest = document.getLeaveRequest();
+            if (leaveRequest != null && leaveRequest.getLeaveType() == LeaveRequest.LeaveType.ANNUAL) {
+                // 연차 차감
+                annualLeaveService.useAnnualLeave(leaveRequest);
+                log.info("Annual leave deducted for approved leave request: {}", document.getDocNumber());
+            }
+        } catch (Exception e) {
+            log.error("Error processing leave request: {}", document.getDocNumber(), e);
+            throw new RuntimeException("휴가 승인 처리 중 오류가 발생했습니다.", e);
+        }
     }
     
     private void processOvertimeRequest(ApprovalDocument document) {

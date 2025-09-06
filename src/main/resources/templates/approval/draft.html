@@ -50,12 +50,14 @@
                             <label>문서 유형 <span class="text-danger">*</span></label>
                             <select class="form-control select2" id="docType" name="docType" required>
                                 <option value="">선택하세요</option>
-                                <option value="VACATION">휴가 신청</option>
-                                <option value="OVERTIME">연장근무 신청</option>
-                                <option value="EXPENSE">경비 청구</option>
-                                <option value="PURCHASE">구매 요청</option>
-                                <option value="GENERAL">일반 기안</option>
-                                <option value="REPORT">업무 보고</option>
+                                <option value="LEAVE_REQUEST">휴가 신청</option>
+                                <option value="OVERTIME_REQUEST">연장근무 신청</option>
+                                <option value="EXPENSE_REQUEST">경비 청구</option>
+                                <option value="PURCHASE_REQUEST">구매 요청</option>
+                                <option value="GENERAL_APPROVAL">일반 결재</option>
+                                <option value="BUSINESS_TRIP">출장 신청</option>
+                                <option value="WORK_FROM_HOME">재택근무 신청</option>
+                                <option value="RESIGNATION">퇴직 신청</option>
                             </select>
                         </div>
                         
@@ -93,8 +95,35 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
+                                        <label>시작시간</label>
+                                        <input type="time" class="form-control" name="startTime" value="09:00">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
                                         <label>종료일</label>
                                         <input type="date" class="form-control" name="endDate">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>종료시간</label>
+                                        <input type="time" class="form-control" name="endTime" value="18:00">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label>
+                                            <input type="checkbox" id="isHourlyLeave" name="isHourlyLeave"> 
+                                            시간단위 휴가
+                                        </label>
+                                        <small class="form-text text-muted">
+                                            체크하면 시간 단위로 휴가를 신청할 수 있습니다.
+                                        </small>
                                     </div>
                                 </div>
                             </div>
@@ -137,7 +166,7 @@
                         <div class="form-group">
                             <label>첨부파일</label>
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="attachments" name="attachments" multiple>
+                                <input type="file" class="custom-file-input" id="attachmentFiles" multiple>
                                 <label class="custom-file-label" for="attachments">파일을 선택하세요</label>
                             </div>
                             <small class="form-text text-muted">
@@ -157,7 +186,7 @@
                             <i class="fas fa-route"></i> 결재선
                         </h3>
                         <div class="card-tools">
-                            <button type="button" class="btn btn-tool btn-sm" data-toggle="modal" data-target="#approvalLineModal">
+                            <button type="button" class="btn btn-tool btn-sm" data-toggle="modal" data-target="#approverModal">
                                 <i class="fas fa-plus"></i> 결재자 추가
                             </button>
                         </div>
@@ -256,16 +285,12 @@
         </div>
     </form>
     
-        </div>
-    </section>
-</div>
-
-<!-- 결재자 선택 모달 -->
-<div class="modal fade" id="approvalLineModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <!-- 결재자 선택 모달 -->
+<div class="modal fade" id="approverModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">결재자 선택</h5>
+                <h4 class="modal-title">결재자 선택</h4>
                 <button type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
                 </button>
@@ -273,49 +298,109 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <h6>조직도</h6>
-                        <div id="orgTree" style="height: 400px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
-                            <!-- 조직도 트리 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>부서별 조직도</h5>
+                            </div>
+                            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <div id="departmentTree"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-8">
-                        <h6>직원 목록</h6>
-                        <div class="form-group">
-                            <input type="text" class="form-control" placeholder="이름으로 검색">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>사용자 목록</h5>
+                                <div class="float-right">
+                                    <input type="text" id="userSearch" class="form-control form-control-sm" 
+                                           placeholder="이름으로 검색" style="width: 200px; display: inline-block;">
+                                </div>
+                            </div>
+                            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-sm" id="userTable">
+                                    <thead>
+                                        <tr>
+                                            <th>이름</th>
+                                            <th>부서</th>
+                                            <th>직급</th>
+                                            <th>선택</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="userTableBody">
+                                        <!-- 사용자 목록이 여기에 로드됩니다 -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
-                        <table class="table table-sm table-hover">
-                            <thead>
-                                <tr>
-                                    <th>선택</th>
-                                    <th>이름</th>
-                                    <th>부서</th>
-                                    <th>직급</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="checkbox" value="1"></td>
-                                    <td>김부장</td>
-                                    <td>개발팀</td>
-                                    <td>부장</td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" value="2"></td>
-                                    <td>이과장</td>
-                                    <td>개발팀</td>
-                                    <td>과장</td>
-                                </tr>
-                            </tbody>
-                        </table>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
-                <button type="button" class="btn btn-primary" onclick="addApprovers()">추가</button>
             </div>
         </div>
     </div>
+</div>
+
+<!-- 참조자 선택 모달 -->
+<div class="modal fade" id="referenceModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">참조자 선택</h4>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>부서별 조직도</h5>
+                            </div>
+                            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <div id="referenceDepartmentTree"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>사용자 목록</h5>
+                                <div class="float-right">
+                                    <input type="text" id="referenceUserSearch" class="form-control form-control-sm" 
+                                           placeholder="이름으로 검색" style="width: 200px; display: inline-block;">
+                                </div>
+                            </div>
+                            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                                <table class="table table-sm" id="referenceUserTable">
+                                    <thead>
+                                        <tr>
+                                            <th>이름</th>
+                                            <th>부서</th>
+                                            <th>직급</th>
+                                            <th>선택</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="referenceUserTableBody">
+                                        <!-- 사용자 목록이 여기에 로드됩니다 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+        </div>
+    </section>
 </div>
 
 <th:block layout:fragment="scripts">
@@ -352,28 +437,410 @@ $(document).ready(function() {
         $('.doc-form').hide();
         
         switch($(this).val()) {
-            case 'VACATION':
+            case 'LEAVE_REQUEST':
                 $('#vacationForm').show();
                 break;
-            case 'EXPENSE':
+            case 'EXPENSE_REQUEST':
                 $('#expenseForm').show();
                 break;
         }
     });
     
-    // 파일 선택시 라벨 변경
+    // 파일 선택시 라벨 변경 및 name 속성 추가
     $('.custom-file-input').on('change', function() {
         var files = $(this)[0].files;
-        var label = files.length > 1 ? files.length + '개 파일 선택됨' : files[0].name;
-        $(this).next('.custom-file-label').text(label);
+        if (files.length > 0) {
+            var label = files.length > 1 ? files.length + '개 파일 선택됨' : files[0].name;
+            $(this).next('.custom-file-label').text(label);
+            // 파일이 선택되면 name 속성 추가
+            $(this).attr('name', 'attachments');
+        } else {
+            $(this).next('.custom-file-label').text('파일을 선택하세요');
+            // 파일이 없으면 name 속성 제거
+            $(this).removeAttr('name');
+        }
+    });
+    
+    // 시간 단위 휴가 체크박스 이벤트
+    $('#isHourlyLeave').change(function() {
+        const isHourly = $(this).is(':checked');
+        const startTimeInput = $('input[name="startTime"]');
+        const endTimeInput = $('input[name="endTime"]');
+        
+        if (isHourly) {
+            // 시간단위 휴가: 시간 선택 가능
+            startTimeInput.prop('disabled', false).prop('readonly', false);
+            endTimeInput.prop('disabled', false).prop('readonly', false);
+            // 같은 날짜로 설정
+            const startDate = $('input[name="startDate"]').val();
+            if (startDate) {
+                $('input[name="endDate"]').val(startDate);
+            }
+        } else {
+            // 일단위 휴가: 9시-18시 고정 (8시간)
+            startTimeInput.val('09:00').prop('disabled', true).prop('readonly', true);
+            endTimeInput.val('18:00').prop('disabled', true).prop('readonly', true);
+        }
+    });
+    
+    // 페이지 로드시 일단위 휴가로 초기화
+    $('#isHourlyLeave').prop('checked', false).trigger('change');
+    
+    // 폼 제출 전 첨부파일 처리
+    $('form').on('submit', function(e) {
+        // 파일이 선택되지 않았다면 name 속성 제거
+        var fileInput = $('#attachmentFiles');
+        if (fileInput[0].files.length === 0) {
+            fileInput.removeAttr('name');
+        }
+        
+        // Summernote 내용을 textarea에 동기화
+        var content = $('.note-editable').html();
+        $('textarea[name="content"]').val(content);
+    });
+    
+    // 결재자 모달이 열릴 때 조직도 데이터 로드
+    $('#approverModal').on('show.bs.modal', function() {
+        if (!organizationData) {
+            loadOrganizationData('approver');
+        } else {
+            renderOrgTree(organizationData.departments, 'approver');
+            renderUserTable(organizationData.users, 'approver');
+        }
+    });
+    
+    // 참조자 모달이 열릴 때 조직도 데이터 로드
+    $('#referenceModal').on('show.bs.modal', function() {
+        if (!organizationData) {
+            loadOrganizationData('reference');
+        } else {
+            renderOrgTree(organizationData.departments, 'reference');
+            renderUserTable(organizationData.users, 'reference');
+        }
+    });
+    
+    // 사용자 검색 이벤트
+    $('#userSearch').on('keyup', function() {
+        const keyword = $(this).val().trim();
+        searchUsers(keyword, 'approver');
+    });
+    
+    $('#referenceUserSearch').on('keyup', function() {
+        const keyword = $(this).val().trim();
+        searchUsers(keyword, 'reference');
     });
 });
 
-// 결재자 추가
-function addApprovers() {
-    // 선택된 결재자 추가 로직
-    $('#approvalLineModal').modal('hide');
+// 전역 변수
+let organizationData = null;
+let approverSequence = 1;
+let selectedReferences = [];
+
+// 조직도 데이터 로드
+function loadOrganizationData(modalType) {
+    $.ajax({
+        url: '/api/users/organization',
+        method: 'GET',
+        success: function(data) {
+            organizationData = data;
+            renderOrgTree(data.departments, modalType);
+            renderUserTable(data.users, modalType);
+        },
+        error: function() {
+            console.error('Failed to load organization data');
+            // 테스트용 더미 데이터
+            organizationData = {
+                departments: [
+                    {deptId: 1, deptName: '경영지원팀', parentDepartment: null},
+                    {deptId: 2, deptName: '개발팀', parentDepartment: null},
+                    {deptId: 3, deptName: '마케팅팀', parentDepartment: null}
+                ],
+                users: [
+                    {userId: 1, name: '홍길동', department: {deptId: 1, deptName: '경영지원팀'}, position: {positionName: '대표이사'}},
+                    {userId: 2, name: '김철수', department: {deptId: 2, deptName: '개발팀'}, position: {positionName: '팀장'}},
+                    {userId: 3, name: '이영희', department: {deptId: 2, deptName: '개발팀'}, position: {positionName: '과장'}},
+                    {userId: 4, name: '박민수', department: {deptId: 3, deptName: '마케팅팀'}, position: {positionName: '대리'}},
+                    {userId: 5, name: '정수진', department: {deptId: 1, deptName: '경영지원팀'}, position: {positionName: '사원'}}
+                ]
+            };
+            renderOrgTree(organizationData.departments, modalType);
+            renderUserTable(organizationData.users, modalType);
+        }
+    });
 }
+
+// 조직도 트리 렌더링
+function renderOrgTree(departments, modalType) {
+    let treeHtml = '<ul class="list-unstyled">';
+    
+    // 상위 부서만 먼저 표시
+    const rootDepartments = departments.filter(dept => !dept.parentDepartment);
+    
+    rootDepartments.forEach(dept => {
+        treeHtml += `<li>
+            <i class="fas fa-sitemap text-primary"></i>
+            <a href="#" onclick="filterUsersByDepartment(${dept.deptId}, '${modalType}')" class="ml-1">
+                ${dept.deptName}
+            </a>
+        </li>`;
+        
+        // 하위 부서 표시
+        const subDepts = departments.filter(d => d.parentDepartment && d.parentDepartment.deptId === dept.deptId);
+        if (subDepts.length > 0) {
+            treeHtml += '<ul class="list-unstyled ml-3">';
+            subDepts.forEach(subDept => {
+                treeHtml += `<li>
+                    <i class="fas fa-users text-info"></i>
+                    <a href="#" onclick="filterUsersByDepartment(${subDept.deptId}, '${modalType}')" class="ml-1">
+                        ${subDept.deptName}
+                    </a>
+                </li>`;
+            });
+            treeHtml += '</ul>';
+        }
+    });
+    
+    treeHtml += '</ul>';
+    
+    if (modalType === 'approver') {
+        $('#departmentTree').html(treeHtml);
+    } else {
+        $('#referenceDepartmentTree').html(treeHtml);
+    }
+}
+
+// 사용자 테이블 렌더링
+function renderUserTable(users, modalType) {
+    if (!users || users.length === 0) {
+        const emptyMsg = '<tr><td colspan="4" class="text-center text-muted">사용자가 없습니다.</td></tr>';
+        if (modalType === 'approver') {
+            $('#userTableBody').html(emptyMsg);
+        } else {
+            $('#referenceUserTableBody').html(emptyMsg);
+        }
+        return;
+    }
+    
+    let tableHtml = '';
+    users.forEach(user => {
+        const deptName = user.department ? user.department.deptName : '미지정';
+        const positionName = user.position ? user.position.positionName : '미지정';
+        
+        tableHtml += `<tr>
+            <td>${user.name}</td>
+            <td>${deptName}</td>
+            <td>${positionName}</td>
+            <td>
+                <button type="button" class="btn btn-sm btn-primary" 
+                        onclick="${modalType === 'approver' ? 'addApproverToLine' : 'addReferenceToList'}({
+                            userId: ${user.userId},
+                            name: '${user.name}',
+                            department: '${deptName}',
+                            position: '${positionName}'
+                        })">
+                    선택
+                </button>
+            </td>
+        </tr>`;
+    });
+    
+    if (modalType === 'approver') {
+        $('#userTableBody').html(tableHtml);
+    } else {
+        $('#referenceUserTableBody').html(tableHtml);
+    }
+}
+
+// 부서별 사용자 필터링
+function filterUsersByDepartment(departmentId, modalType) {
+    if (!organizationData) return;
+    
+    const filteredUsers = organizationData.users.filter(user => 
+        user.department && user.department.deptId === departmentId
+    );
+    
+    renderUserTable(filteredUsers, modalType);
+}
+
+// 사용자 검색
+function searchUsers(keyword, modalType) {
+    if (!organizationData) return;
+    
+    if (!keyword) {
+        renderUserTable(organizationData.users, modalType);
+        return;
+    }
+    
+    const filteredUsers = organizationData.users.filter(user =>
+        user.name.includes(keyword) || 
+        (user.department && user.department.deptName.includes(keyword))
+    );
+    
+    renderUserTable(filteredUsers, modalType);
+}
+
+// 참조자 목록에 추가
+function addReferenceToList(user) {
+    // 이미 추가된 참조자인지 확인
+    if (selectedReferences.some(ref => ref.userId === user.userId)) {
+        alert('이미 추가된 참조자입니다.');
+        return;
+    }
+    
+    selectedReferences.push(user);
+    
+    // 참조자 목록 UI 업데이트
+    let refHtml = '';
+    selectedReferences.forEach(ref => {
+        refHtml += `
+            <div class="badge badge-info m-1" data-user-id="${ref.userId}">
+                ${ref.name} (${ref.department})
+                <span class="ml-1" style="cursor: pointer;" onclick="removeReference(${ref.userId})">
+                    <i class="fas fa-times"></i>
+                </span>
+                <input type="hidden" name="referenceIds" value="${ref.userId}">
+            </div>
+        `;
+    });
+    
+    if (selectedReferences.length === 0) {
+        refHtml = '<p class="text-muted text-center">참조자 없음</p>';
+    }
+    
+    $('#referenceList').html(refHtml);
+    $('#referenceModal').modal('hide');
+}
+
+// 참조자 제거
+function removeReference(userId) {
+    selectedReferences = selectedReferences.filter(ref => ref.userId !== userId);
+    
+    let refHtml = '';
+    selectedReferences.forEach(ref => {
+        refHtml += `
+            <div class="badge badge-info m-1" data-user-id="${ref.userId}">
+                ${ref.name} (${ref.department})
+                <span class="ml-1" style="cursor: pointer;" onclick="removeReference(${ref.userId})">
+                    <i class="fas fa-times"></i>
+                </span>
+                <input type="hidden" name="referenceIds" value="${ref.userId}">
+            </div>
+        `;
+    });
+    
+    if (selectedReferences.length === 0) {
+        refHtml = '<p class="text-muted text-center">참조자 없음</p>';
+    }
+    
+    $('#referenceList').html(refHtml);
+}
+
+// 결재선에 결재자 추가
+function addApproverToLine(user) {
+    // 이미 추가된 결재자인지 확인
+    if ($(`#approvalLineTable tr[data-user-id="${user.userId}"]`).length > 0) {
+        alert('이미 추가된 결재자입니다.');
+        return;
+    }
+    
+    // "결재자를 추가하세요" 행 제거
+    $('.no-approver').remove();
+    
+    const rowHtml = `<tr data-user-id="${user.userId}" data-sequence="${approverSequence}">
+        <td class="text-center">${approverSequence}</td>
+        <td>
+            <strong>${user.name}</strong><br>
+            <small class="text-muted">${user.department} ${user.position}</small>
+        </td>
+        <td>
+            <select class="form-control form-control-sm approval-type" name="approvalTypes">
+                <option value="APPROVAL">결재</option>
+                <option value="AGREEMENT">합의</option>
+            </select>
+        </td>
+        <td class="text-center">
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeApprover(this)">
+                <i class="fas fa-times"></i>
+            </button>
+        </td>
+        <input type="hidden" name="approverIds" value="${user.userId}">
+    </tr>`;
+    
+    $('#approvalLineTable tbody').append(rowHtml);
+    approverSequence++;
+    
+    // 모달 닫기
+    $('#approverModal').modal('hide');
+}
+
+// 결재자 제거
+function removeApprover(button) {
+    $(button).closest('tr').remove();
+    
+    // 순서 재정렬
+    $('#approvalLineTable tbody tr').each(function(index) {
+        if (!$(this).hasClass('no-approver')) {
+            $(this).find('td:first').text(index + 1);
+            $(this).data('sequence', index + 1);
+        }
+    });
+    
+    // 결재자가 없으면 안내 메시지 표시
+    if ($('#approvalLineTable tbody tr').length === 0) {
+        $('#approvalLineTable tbody').append(`
+            <tr class="no-approver">
+                <td colspan="4" class="text-center text-muted py-3">
+                    결재자를 추가하세요
+                </td>
+            </tr>
+        `);
+        approverSequence = 1;
+    }
+}
+
+// 폼 제출 전 검증 및 데이터 정리
+$('#draftForm').on('submit', function(e) {
+    const docType = $('#docType').val();
+    
+    // 휴가 신청인 경우 추가 데이터 처리
+    if (docType === 'LEAVE_REQUEST') {
+        const startDate = $('input[name="startDate"]').val();
+        const endDate = $('input[name="endDate"]').val();
+        const startTime = $('input[name="startTime"]').val();
+        const endTime = $('input[name="endTime"]').val();
+        const isHourly = $('#isHourlyLeave').is(':checked');
+        
+        if (!startDate || !endDate) {
+            e.preventDefault();
+            alert('휴가 기간을 입력해주세요.');
+            return false;
+        }
+        
+        // formData로 전달할 JSON 데이터 생성
+        const leaveData = {
+            vacationType: $('select[name="vacationType"]').val(),
+            startDate: startDate,
+            endDate: endDate,
+            startTime: startTime || '09:00',
+            endTime: endTime || '18:00',
+            isHourlyLeave: isHourly
+        };
+        
+        // hidden input으로 formData 전달
+        $('<input>').attr({
+            type: 'hidden',
+            name: 'formData',
+            value: JSON.stringify(leaveData)
+        }).appendTo(this);
+    }
+    
+    // 결재자가 없으면 경고
+    if ($('#approvalLineTable tbody tr:not(.no-approver)').length === 0) {
+        e.preventDefault();
+        alert('결재자를 추가해주세요.');
+        return false;
+    }
+})
 
 // 임시저장
 function saveDraft() {
@@ -386,5 +853,6 @@ function previewDocument() {
 }
 </script>
 </th:block>
+
 </body>
 </html>

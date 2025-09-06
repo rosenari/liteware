@@ -7,6 +7,7 @@ import com.liteware.model.entity.approval.*;
 import com.liteware.repository.UserRepository;
 import com.liteware.repository.approval.ApprovalDocumentRepository;
 import com.liteware.repository.approval.ApprovalLineRepository;
+import com.liteware.service.leave.AnnualLeaveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,6 +33,7 @@ public class ApprovalService {
     private final ApprovalLineRepository approvalLineRepository;
     private final UserRepository userRepository;
     private final ApprovalWorkflowService workflowService;
+    private final AnnualLeaveService annualLeaveService;
     
     public ApprovalDocument createDocument(ApprovalDocumentDto dto) {
         return draftDocument(dto);

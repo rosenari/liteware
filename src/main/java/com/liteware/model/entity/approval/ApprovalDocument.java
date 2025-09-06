@@ -82,6 +82,15 @@ public class ApprovalDocument extends BaseEntity {
     @Builder.Default
     private List<ApprovalAttachment> attachments = new ArrayList<>();
     
+    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private LeaveRequest leaveRequest;
+    
+    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private OvertimeRequest overtimeRequest;
+    
+    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private ExpenseRequest expenseRequest;
+    
     @Column(name = "is_deleted")
     @Builder.Default
     private Boolean isDeleted = false;

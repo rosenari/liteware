@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -49,8 +50,7 @@ public class ApprovalDocumentDto {
     @Builder.Default
     private List<ApprovalLineDto> approvalLines = new ArrayList<>();
     
-    @Builder.Default
-    private List<AttachmentDto> attachments = new ArrayList<>();
+    // Attachments are handled separately in the controller, not part of form binding
     
     private Boolean isDeleted;
     

@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.time.Duration;
 
 @Entity
 @Table(name = "leave_requests")
@@ -32,7 +35,17 @@ public class LeaveRequest {
     @Column(nullable = false)
     private LocalDate endDate;
     
-    private Integer leaveDays;      // 휴가 일수
+    private LocalTime startTime;     // 시작 시간 (시간 단위 휴가용)
+    
+    private LocalTime endTime;       // 종료 시간 (시간 단위 휴가용)
+    
+    @Builder.Default
+    @Column(nullable = false)
+    private Boolean isHourlyLeave = false;  // 시간 단위 휴가 여부
+    
+    private Double leaveHours;       // 휴가 시간 (시간 단위)
+    
+    private Integer leaveDays;       // 휴가 일수 (일 단위)
     
     private String reason;          // 휴가 사유
     
@@ -64,12 +77,37 @@ public class LeaveRequest {
         }
     }
     
-    // 휴가 일수 자동 계산
+    // 휴가 일수/시간 자동 계산
     @PrePersist
     @PreUpdate
-    public void calculateLeaveDays() {
-        if (startDate != null && endDate != null) {
-            this.leaveDays = (int) (endDate.toEpochDay() - startDate.toEpochDay() + 1);
+    public void calculateLeaveTime() {
+        if (isHourlyLeave != null && isHourlyLeave) {
+            // 시간 단위 휴가인 경우
+            if (startDate != null && endDate != null && startTime != null && endTime != null) {
+                LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
+                LocalDateTime endDateTime = LocalDateTime.of(endDate, endTime);
+                
+                Duration duration = Duration.between(startDateTime, endDateTime);
+                this.leaveHours = duration.toMinutes() / 60.0; // 분을 시간으로 변환
+                
+                // 일수도 계산 (8시간 = 1일 기준)
+                this.leaveDays = (int) Math.ceil(leaveHours / 8.0);
+            }
+        } else {
+            // 일 단위 휴가인 경우
+            if (startDate != null && endDate != null) {
+                this.leaveDays = (int) (endDate.toEpochDay() - startDate.toEpochDay() + 1);
+                this.leaveHours = leaveDays * 8.0; // 1일 = 8시간으로 환산
+            }
+        }
+    }
+    
+    // 휴가 기간 문자열 반환
+    public String getLeaveTimeDisplay() {
+        if (isHourlyLeave != null && isHourlyLeave) {
+            return String.format("%.1f시간", leaveHours);
+        } else {
+            return leaveDays + "일";
         }
     }
 }
