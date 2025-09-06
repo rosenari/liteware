@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>사용자 관리 | Liteware</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">사용자 관리</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">홈</a></li>
+                        <li class="breadcrumb-item">관리자</li>
+                        <li class="breadcrumb-item active">사용자 관리</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <!-- 통계 정보 -->
+            <div class="row">
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-info">
+                        <div class="inner">
+                            <h3 th:text="${totalUsers}">10</h3>
+                            <p>전체 사용자</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-success">
+                        <div class="inner">
+                            <h3 th:text="${activeUsers}">8</h3>
+                            <p>활성 사용자</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-warning">
+                        <div class="inner">
+                            <h3>2</h3>
+                            <p>비활성 사용자</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-times"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-6">
+                    <div class="small-box bg-danger">
+                        <div class="inner">
+                            <h3>1</h3>
+                            <p>관리자</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 사용자 목록 -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">사용자 목록</h3>
+                    <div class="card-tools">
+                        <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addUserModal">
+                            <i class="fas fa-user-plus"></i> 새 사용자 추가
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px">#</th>
+                                <th>사용자명</th>
+                                <th>이름</th>
+                                <th>이메일</th>
+                                <th>부서</th>
+                                <th>직급</th>
+                                <th>권한</th>
+                                <th>상태</th>
+                                <th style="width: 150px">액션</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="user, iterStat : ${users}">
+                                <td th:text="${iterStat.count}">1</td>
+                                <td th:text="${user.loginId}">admin</td>
+                                <td th:text="${user.name}">관리자</td>
+                                <td th:text="${user.email}">admin@liteware.com</td>
+                                <td th:text="${user.department?.name}">개발부</td>
+                                <td th:text="${user.position?.name}">과장</td>
+                                <td>
+                                    <span class="badge badge-danger" th:if="${user.loginId == 'admin'}">관리자</span>
+                                    <span class="badge badge-info" th:unless="${user.loginId == 'admin'}">일반</span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-success" th:if="${user.status?.name() == 'ACTIVE'}">활성</span>
+                                    <span class="badge badge-warning" th:unless="${user.status?.name() == 'ACTIVE'}">비활성</span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-xs btn-info" onclick="editUser([[${user.userId}]])">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-xs btn-warning" onclick="toggleUserStatus([[${user.userId}]])">
+                                        <i class="fas fa-power-off"></i>
+                                    </button>
+                                    <button class="btn btn-xs btn-danger" onclick="deleteUser([[${user.userId}]])">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<th:block layout:fragment="scripts">
+<script>
+function editUser(userId) {
+    // 사용자 수정 로직
+    alert('사용자 수정: ' + userId);
+}
+
+function toggleUserStatus(userId) {
+    if (confirm('사용자 상태를 변경하시겠습니까?')) {
+        $.post('/admin/users/' + userId + '/toggle', function(result) {
+            if (result === 'success') {
+                location.reload();
+            }
+        });
+    }
+}
+
+function deleteUser(userId) {
+    if (confirm('정말 삭제하시겠습니까?')) {
+        // 사용자 삭제 로직
+        alert('사용자 삭제: ' + userId);
+    }
+}
+</script>
+</th:block>
+</body>
+</html>

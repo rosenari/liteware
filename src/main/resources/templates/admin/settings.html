@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" 
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>시스템 설정 | Liteware</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">시스템 설정</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">홈</a></li>
+                        <li class="breadcrumb-item">관리자</li>
+                        <li class="breadcrumb-item active">시스템 설정</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
+            <form method="post" action="/admin/settings/save">
+                <div class="row">
+                    <!-- 기본 설정 -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-cog"></i> 기본 설정
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>시스템 이름</label>
+                                    <input type="text" class="form-control" name="systemName" 
+                                           th:value="${systemName}" placeholder="시스템 이름">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>버전</label>
+                                    <input type="text" class="form-control" th:value="${version}" 
+                                           readonly disabled>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>최대 파일 크기</label>
+                                    <input type="text" class="form-control" name="maxFileSize" 
+                                           th:value="${maxFileSize}" placeholder="예: 50MB">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>세션 타임아웃</label>
+                                    <input type="text" class="form-control" name="sessionTimeout" 
+                                           th:value="${sessionTimeout}" placeholder="예: 30분">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 보안 설정 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-shield-alt"></i> 보안 설정
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>비밀번호 정책</label>
+                                    <input type="text" class="form-control" th:value="${passwordPolicy}" 
+                                           readonly disabled>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="twoFactorAuth" checked>
+                                        <label class="custom-control-label" for="twoFactorAuth">
+                                            2단계 인증 사용
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="passwordExpiry" checked>
+                                        <label class="custom-control-label" for="passwordExpiry">
+                                            비밀번호 만료 (90일)
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="accountLock">
+                                        <label class="custom-control-label" for="accountLock">
+                                            5회 실패시 계정 잠금
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 알림 설정 -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-bell"></i> 알림 설정
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="emailNotification" checked>
+                                        <label class="custom-control-label" for="emailNotification">
+                                            이메일 알림
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="smsNotification">
+                                        <label class="custom-control-label" for="smsNotification">
+                                            SMS 알림
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="pushNotification" checked>
+                                        <label class="custom-control-label" for="pushNotification">
+                                            푸시 알림
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>알림 이메일 주소</label>
+                                    <input type="email" class="form-control" 
+                                           value="admin@liteware.com" placeholder="admin@example.com">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 백업 설정 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <i class="fas fa-database"></i> 백업 설정
+                                </h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>자동 백업 주기</label>
+                                    <select class="form-control">
+                                        <option>매일</option>
+                                        <option selected>매주</option>
+                                        <option>매월</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>백업 시간</label>
+                                    <input type="time" class="form-control" value="02:00">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>백업 보관 기간</label>
+                                    <select class="form-control">
+                                        <option>7일</option>
+                                        <option>14일</option>
+                                        <option selected>30일</option>
+                                        <option>90일</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-warning btn-block">
+                                        <i class="fas fa-download"></i> 수동 백업 실행
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 저장 버튼 -->
+                <div class="row">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> 설정 저장
+                        </button>
+                        <button type="button" class="btn btn-default" onclick="location.reload()">
+                            <i class="fas fa-undo"></i> 초기화
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+</div>
+</body>
+</html>
