@@ -7,6 +7,7 @@ import com.liteware.model.entity.board.Post;
 import com.liteware.repository.UserRepository;
 import com.liteware.repository.board.CommentRepository;
 import com.liteware.repository.board.PostRepository;
+import com.liteware.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,7 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
     
     public Comment createComment(CommentDto dto) {
         Post post = postRepository.findById(dto.getPostId())
@@ -50,7 +52,32 @@ public class CommentService {
             comment.setDepth(parentComment.getDepth() + 1);
         }
         
-        return commentRepository.save(comment);
+        Comment savedComment = commentRepository.save(comment);
+        
+        // 게시글 작성자에게 댓글 알림 (본인이 작성한 글에 본인이 댓글을 달면 알림하지 않음)
+        if (!post.getWriter().getUserId().equals(writer.getUserId())) {
+            notificationService.createCommentNotification(
+                post.getWriter().getUserId(),
+                post.getPostId(),
+                post.getTitle(),
+                writer.getName()
+            );
+        }
+        
+        // 부모 댓글 작성자에게도 알림 (대댓글의 경우)
+        if (dto.getParentCommentId() != null && comment.getParentComment() != null) {
+            Comment parentComment = comment.getParentComment();
+            if (!parentComment.getWriter().getUserId().equals(writer.getUserId())) {
+                notificationService.createCommentNotification(
+                    parentComment.getWriter().getUserId(),
+                    post.getPostId(),
+                    post.getTitle(),
+                    writer.getName()
+                );
+            }
+        }
+        
+        return savedComment;
     }
     
     public Comment updateComment(Long commentId, String content, Long userId) {

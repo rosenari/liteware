@@ -47,4 +47,12 @@ public interface ApprovalLineRepository extends JpaRepository<ApprovalLine, Long
     
     @Query("SELECT l FROM ApprovalLine l WHERE l.approver.userId = :approverId AND l.status = :status")
     List<ApprovalLine> findByApproverIdAndStatus(@Param("approverId") Long approverId, @Param("status") ApprovalStatus status);
+    
+    Optional<ApprovalLine> findByDocumentAndDelegatedTo(ApprovalDocument document, User delegatedTo);
+    
+    @Query("SELECT l FROM ApprovalLine l WHERE l.delegatedTo = :delegatedTo AND l.status = 'PENDING'")
+    List<ApprovalLine> findPendingDelegatedLines(@Param("delegatedTo") User delegatedTo);
+    
+    @Query("SELECT l FROM ApprovalLine l WHERE l.approver = :approver AND l.delegatedTo IS NOT NULL")
+    List<ApprovalLine> findDelegatedLinesByApprover(@Param("approver") User approver);
 }

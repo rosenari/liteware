@@ -177,6 +177,11 @@ public class FileService {
      * 파일 유효성 검사
      */
     private void validateFile(MultipartFile file) {
+        // 파일이 비어있는지 확인
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("File is empty");
+        }
+        
         // 파일 크기 검사
         if (file.getSize() > maxFileSize) {
             throw new IllegalArgumentException("File size exceeds maximum limit: " + maxFileSize);
@@ -185,11 +190,34 @@ public class FileService {
         // 파일 확장자 검사
         String fileName = file.getOriginalFilename();
         if (fileName != null) {
+            // Path traversal 공격 방지
+            if (fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
+                throw new IllegalArgumentException("Invalid file name: " + fileName);
+            }
+            
             String extension = getFileExtension(fileName);
             if (!isAllowedExtension(extension)) {
                 throw new IllegalArgumentException("File extension not allowed: " + extension);
             }
+            
+            // 실행 파일 차단
+            if (isExecutableFile(extension)) {
+                throw new IllegalArgumentException("Executable files are not allowed");
+            }
         }
+    }
+    
+    /**
+     * 실행 파일 확인
+     */
+    private boolean isExecutableFile(String extension) {
+        String[] executableExtensions = {"exe", "sh", "bat", "cmd", "com", "msi", "app", "deb", "rpm"};
+        for (String ext : executableExtensions) {
+            if (ext.equalsIgnoreCase(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**

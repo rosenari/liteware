@@ -75,7 +75,10 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/api/test/**").permitAll()  // 테스트 데이터 생성 API
                 
-                // Role-based access control
+                // Role-based access control for web pages
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                
+                // Role-based access control for API endpoints
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/manager/**").hasAnyRole("ADMIN", "MANAGER")
                 

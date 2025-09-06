@@ -2,18 +2,24 @@ package com.liteware.controller.api;
 
 import com.liteware.model.dto.CommentDto;
 import com.liteware.model.dto.PostDto;
+import com.liteware.model.dto.PostSearchCriteria;
 import com.liteware.model.entity.board.Comment;
 import com.liteware.model.entity.board.Post;
 import com.liteware.service.board.BoardService;
 import com.liteware.service.board.CommentService;
+import com.liteware.repository.board.PostRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -223,5 +229,95 @@ public class BoardApiController {
             log.error("Failed to upload image", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+    
+    /**
+     * 고급 검색 API
+     */
+    @GetMapping("/search/advanced")
+    public ResponseEntity<Page<Post>> advancedSearch(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) PostSearchCriteria.SearchField searchField,
+            @RequestParam(required = false) Long boardId,
+            @RequestParam(required = false) Long writerId,
+            @RequestParam(required = false) String writerName,
+            @RequestParam(required = false) Long departmentId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(required = false) Boolean isNotice,
+            @RequestParam(required = false) Boolean isSecret,
+            @RequestParam(required = false) Boolean hasAttachment,
+            @RequestParam(required = false) Integer minViewCount,
+            @RequestParam(required = false) Integer minLikeCount,
+            @RequestParam(required = false) PostSearchCriteria.SortType sortType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        PostSearchCriteria criteria = PostSearchCriteria.builder()
+                .keyword(keyword)
+                .searchField(searchField)
+                .boardId(boardId)
+                .writerId(writerId)
+                .writerName(writerName)
+                .departmentId(departmentId)
+                .startDate(startDate)
+                .endDate(endDate)
+                .isNotice(isNotice)
+                .isSecret(isSecret)
+                .hasAttachment(hasAttachment)
+                .minViewCount(minViewCount)
+                .minLikeCount(minLikeCount)
+                .sortType(sortType)
+                .build();
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> results = boardService.advancedSearch(criteria, pageable);
+        
+        log.info("Advanced search executed: {} results found", results.getTotalElements());
+        
+        return ResponseEntity.ok(results);
+    }
+    
+    /**
+     * 고급 검색 API (POST 방식)
+     */
+    @PostMapping("/search/advanced")
+    public ResponseEntity<Page<Post>> advancedSearchPost(
+            @RequestBody PostSearchCriteria criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Post> results = boardService.advancedSearch(criteria, pageable);
+        
+        log.info("Advanced search (POST) executed: {} results found", results.getTotalElements());
+        
+        return ResponseEntity.ok(results);
+    }
+    
+    /**
+     * 통계 정보를 포함한 고급 검색 API
+     */
+    @PostMapping("/search/advanced/stats")
+    public ResponseEntity<Map<String, Object>> advancedSearchWithStats(
+            @RequestBody PostSearchCriteria criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        Pageable pageable = PageRequest.of(page, size);
+        PostRepositoryCustom.SearchResult result = boardService.advancedSearchWithStats(criteria, pageable);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("posts", result.getPosts());
+        response.put("statistics", Map.of(
+            "totalCount", result.getTotalCount(),
+            "noticeCount", result.getNoticeCount(),
+            "secretCount", result.getSecretCount(),
+            "attachmentCount", result.getAttachmentCount()
+        ));
+        
+        log.info("Advanced search with stats executed: {} total results", result.getTotalCount());
+        
+        return ResponseEntity.ok(response);
     }
 }

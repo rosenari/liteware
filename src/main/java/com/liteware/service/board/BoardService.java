@@ -2,12 +2,14 @@ package com.liteware.service.board;
 
 import com.liteware.model.dto.BoardDto;
 import com.liteware.model.dto.PostDto;
+import com.liteware.model.dto.PostSearchCriteria;
 import com.liteware.model.entity.User;
 import com.liteware.model.entity.board.Board;
 import com.liteware.model.entity.board.Post;
 import com.liteware.repository.UserRepository;
 import com.liteware.repository.board.BoardRepository;
 import com.liteware.repository.board.PostRepository;
+import com.liteware.repository.board.PostRepositoryCustom;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -155,6 +157,30 @@ public class BoardService {
     @Transactional(readOnly = true)
     public Page<Post> searchPosts(String keyword, Pageable pageable) {
         return postRepository.searchPosts(keyword, pageable);
+    }
+    
+    /**
+     * 고급 검색 기능
+     * @param criteria 검색 조건
+     * @param pageable 페이징 정보
+     * @return 검색 결과
+     */
+    @Transactional(readOnly = true)
+    public Page<Post> advancedSearch(PostSearchCriteria criteria, Pageable pageable) {
+        log.info("Advanced search with criteria: {}", criteria);
+        return postRepository.searchWithCriteria(criteria, pageable);
+    }
+    
+    /**
+     * 통계 정보를 포함한 고급 검색
+     * @param criteria 검색 조건
+     * @param pageable 페이징 정보
+     * @return 검색 결과 및 통계
+     */
+    @Transactional(readOnly = true)
+    public PostRepositoryCustom.SearchResult advancedSearchWithStats(PostSearchCriteria criteria, Pageable pageable) {
+        log.info("Advanced search with stats for criteria: {}", criteria);
+        return postRepository.searchWithStats(criteria, pageable);
     }
     
     @Transactional(readOnly = true)

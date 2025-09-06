@@ -8,6 +8,7 @@ import com.liteware.repository.UserRepository;
 import com.liteware.repository.approval.ApprovalDocumentRepository;
 import com.liteware.repository.approval.ApprovalLineRepository;
 import com.liteware.service.leave.AnnualLeaveService;
+import com.liteware.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,6 +35,7 @@ public class ApprovalService {
     private final UserRepository userRepository;
     private final ApprovalWorkflowService workflowService;
     private final AnnualLeaveService annualLeaveService;
+    private final NotificationService notificationService;
     
     public ApprovalDocument createDocument(ApprovalDocumentDto dto) {
         return draftDocument(dto);
@@ -143,9 +145,18 @@ public class ApprovalService {
         document.setDraftedAt(LocalDateTime.now());
         document.setCurrentApprover(firstLine.getApprover());
         
-        log.info("Document submitted: {}", document.getDocNumber());
+        ApprovalDocument savedDocument = documentRepository.save(document);
         
-        return documentRepository.save(document);
+        // 승인자에게 알림 전송
+        notificationService.createApprovalRequestNotification(
+            firstLine.getApprover().getUserId(),
+            savedDocument.getDocId(),
+            savedDocument.getTitle()
+        );
+        
+        log.info("Document submitted: {}", savedDocument.getDocNumber());
+        
+        return savedDocument;
     }
     
     public ApprovalDocument approveDocument(Long docId, Long approverId, String comment) {
@@ -176,11 +187,24 @@ public class ApprovalService {
         
         if (nextLine != null) {
             document.setCurrentApprover(nextLine.getApprover());
+            // 다음 결재자에게 알림 전송
+            notificationService.createApprovalRequestNotification(
+                nextLine.getApprover().getUserId(),
+                document.getDocId(),
+                document.getTitle()
+            );
         } else {
             document.setStatus(DocumentStatus.APPROVED);
             document.setCurrentApprover(null);
             document.setCompletedAt(LocalDateTime.now());
             workflowService.onDocumentApproved(document);
+            // 기안자에게 승인 완료 알림
+            notificationService.createApprovalCompletedNotification(
+                document.getDrafter().getUserId(),
+                document.getDocId(),
+                document.getTitle(),
+                true
+            );
         }
         
         log.info("Document approved by {}: {}", approver.getName(), document.getDocNumber());
@@ -214,6 +238,14 @@ public class ApprovalService {
         document.setCompletedAt(LocalDateTime.now());
         
         workflowService.onDocumentRejected(document, reason);
+        
+        // 기안자에게 반려 알림
+        notificationService.createApprovalCompletedNotification(
+            document.getDrafter().getUserId(),
+            document.getDocId(),
+            document.getTitle(),
+            false
+        );
         
         log.info("Document rejected by {}: {}", approver.getName(), document.getDocNumber());
         
@@ -264,6 +296,73 @@ public class ApprovalService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         
         return documentRepository.findByDrafter(user);
+    }
+    
+    public void delegateApproval(Long fromUserId, Long toUserId, LocalDateTime startDate, LocalDateTime endDate) {
+        User fromUser = userRepository.findById(fromUserId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        User toUser = userRepository.findById(toUserId)
+                .orElseThrow(() -> new RuntimeException("대리 결재자를 찾을 수 없습니다"));
+        
+        List<ApprovalDocument> pendingDocuments = documentRepository
+                .findByCurrentApproverAndStatus(fromUser, DocumentStatus.PENDING);
+        
+        for (ApprovalDocument document : pendingDocuments) {
+            List<ApprovalLine> lines = approvalLineRepository.findByDocument(document);
+            for (ApprovalLine line : lines) {
+                if (line.getApprover().equals(fromUser) && 
+                    line.getStatus() == ApprovalStatus.PENDING) {
+                    line.setDelegatedTo(toUser);
+                    line.setDelegatedAt(LocalDateTime.now());
+                    approvalLineRepository.save(line);
+                    
+                    if (document.getCurrentApprover().equals(fromUser)) {
+                        document.setCurrentApprover(toUser);
+                        documentRepository.save(document);
+                    }
+                }
+            }
+        }
+        
+        log.info("Delegated approval from {} to {} for period {} to {}", 
+                fromUser.getName(), toUser.getName(), startDate, endDate);
+    }
+    
+    public ApprovalDocument approveDelegatedDocument(Long docId, Long delegateUserId, String comment) {
+        ApprovalDocument document = documentRepository.findById(docId)
+                .orElseThrow(() -> new RuntimeException("문서를 찾을 수 없습니다"));
+        
+        User delegateUser = userRepository.findById(delegateUserId)
+                .orElseThrow(() -> new RuntimeException("대리 결재자를 찾을 수 없습니다"));
+        
+        if (document.getStatus() != DocumentStatus.PENDING) {
+            throw new RuntimeException("진행중인 문서만 결재할 수 있습니다");
+        }
+        
+        ApprovalLine currentLine = approvalLineRepository
+                .findByDocumentAndDelegatedTo(document, delegateUser)
+                .orElseThrow(() -> new RuntimeException("대리 결재 권한이 없습니다"));
+        
+        currentLine.approve(comment + " (대리결재: " + delegateUser.getName() + ")");
+        approvalLineRepository.save(currentLine);
+        
+        Integer nextOrder = currentLine.getOrderSeq() + 1;
+        ApprovalLine nextLine = approvalLineRepository
+                .findByDocumentAndOrderSeq(document, nextOrder)
+                .orElse(null);
+        
+        if (nextLine != null) {
+            document.setCurrentApprover(nextLine.getApprover());
+        } else {
+            document.setStatus(DocumentStatus.APPROVED);
+            document.setCurrentApprover(null);
+            document.setCompletedAt(LocalDateTime.now());
+            workflowService.onDocumentApproved(document);
+        }
+        
+        log.info("Document approved by delegate {}: {}", delegateUser.getName(), document.getDocNumber());
+        
+        return documentRepository.save(document);
     }
     
     @Transactional(readOnly = true)
