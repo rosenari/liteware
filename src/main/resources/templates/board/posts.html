@@ -3,17 +3,37 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       layout:decorate="~{layout/base}">
 <head>
-    <title th:text="${board?.name} + ' | Liteware'">게시판 | Liteware</title>
+    <title th:text="${board?.boardName} + ' | Liteware'">게시판 | Liteware</title>
 </head>
 <body>
 <div layout:fragment="content">
-    <div th:replace="~{layout/base :: content-header(pageTitle=${board?.name != null ? board.name : '게시판'})"></div>
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0" th:text="${board?.boardName != null ? board.boardName : '게시판'}">게시판</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">홈</a></li>
+                        <li class="breadcrumb-item">게시판</li>
+                        <li class="breadcrumb-item active" th:text="${board?.boardName}">게시판</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
     
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-clipboard-list"></i>
-                <span th:text="${board?.name}">게시판</span>
+                <span th:text="${board?.boardName}">게시판</span>
             </h3>
             <div class="card-tools">
                 <a th:href="@{/board/{boardId}/write(boardId=${board?.boardId})}" class="btn btn-primary btn-sm">
@@ -60,11 +80,11 @@
                             <td>
                                 <a th:href="@{/board/{boardId}/post/{postId}(boardId=${board?.boardId}, postId=${notice.postId})}">
                                     <strong th:text="${notice.title}">공지사항 제목</strong>
-                                    <span class="badge badge-danger" th:if="${notice.isNew}">New</span>
-                                    <span class="text-muted" th:if="${notice.commentCount > 0}">
-                                        [<span th:text="${notice.commentCount}">0</span>]
+                                    
+                                    <span class="text-muted" th:if="${notice.comments != null and !notice.comments.isEmpty()}">
+                                        [<span th:text="${notice.comments.size()}">0</span>]
                                     </span>
-                                    <i class="fas fa-paperclip text-muted ml-1" th:if="${notice.hasAttachment}"></i>
+                                    <i class="fas fa-paperclip text-muted ml-1" th:if="${notice.attachments != null and !notice.attachments.isEmpty()}"></i>
                                 </a>
                             </td>
                             <td th:text="${notice.writer?.name}">관리자</td>
@@ -78,11 +98,11 @@
                             <td>
                                 <a th:href="@{/board/{boardId}/post/{postId}(boardId=${board?.boardId}, postId=${post.postId})}">
                                     <span th:text="${post.title}">게시글 제목</span>
-                                    <span class="badge badge-danger" th:if="${post.isNew}">New</span>
-                                    <span class="text-muted" th:if="${post.commentCount > 0}">
-                                        [<span th:text="${post.commentCount}">0</span>]
+                                    
+                                    <span class="text-muted" th:if="${post.comments != null and !post.comments.isEmpty()}">
+                                        [<span th:text="${post.comments.size()}">0</span>]
                                     </span>
-                                    <i class="fas fa-paperclip text-muted ml-1" th:if="${post.hasAttachment}"></i>
+                                    <i class="fas fa-paperclip text-muted ml-1" th:if="${post.attachments != null and !post.attachments.isEmpty()}"></i>
                                 </a>
                             </td>
                             <td th:text="${post.writer?.name}">작성자</td>
@@ -130,6 +150,9 @@
             </nav>
         </div>
     </div>
+    
+        </div>
+    </section>
 </div>
 
 <th:block layout:fragment="scripts">

@@ -12,7 +12,27 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <div th:replace="~{layout/base :: content-header(pageTitle='기안 작성')}"></div>
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">기안 작성</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">홈</a></li>
+                        <li class="breadcrumb-item">전자결재</li>
+                        <li class="breadcrumb-item active">기안 작성</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
     
     <form id="draftForm" method="post" action="/approval/draft" enctype="multipart/form-data">
         <div class="row">
@@ -235,6 +255,9 @@
             </div>
         </div>
     </form>
+    
+        </div>
+    </section>
 </div>
 
 <!-- 결재자 선택 모달 -->

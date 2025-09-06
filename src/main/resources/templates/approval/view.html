@@ -17,7 +17,27 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <div th:replace="~{layout/base :: content-header(pageTitle='전자결재 상세')"></div>
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">전자결재 상세</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">홈</a></li>
+                        <li class="breadcrumb-item">전자결재</li>
+                        <li class="breadcrumb-item active">문서 상세</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
     
     <div class="row">
         <!-- 좌측: 문서 내용 -->
@@ -250,6 +270,9 @@
             </div>
         </div>
     </div>
+    
+        </div>
+    </section>
 </div>
 
 <th:block layout:fragment="scripts">

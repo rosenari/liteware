@@ -106,15 +106,15 @@
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
                     <li class="nav-item">
-                        <a href="/dashboard" th:classappend="${#request.requestURI == '/dashboard' ? 'active' : ''}" class="nav-link">
+                        <a href="/dashboard" class="nav-link">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>대시보드</p>
                         </a>
                     </li>
                     
                     <!-- 전자결재 -->
-                    <li class="nav-item has-treeview" th:classappend="${#strings.contains(#request.requestURI, '/approval') ? 'menu-open' : ''}">
-                        <a href="#" class="nav-link" th:classappend="${#strings.contains(#request.requestURI, '/approval') ? 'active' : ''}">
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-file-signature"></i>
                             <p>
                                 전자결재
@@ -151,8 +151,8 @@
                     </li>
                     
                     <!-- 게시판 -->
-                    <li class="nav-item has-treeview" th:classappend="${#strings.contains(#request.requestURI, '/board') ? 'menu-open' : ''}">
-                        <a href="#" class="nav-link" th:classappend="${#strings.contains(#request.requestURI, '/board') ? 'active' : ''}">
+                    <li class="nav-item has-treeview">
+                        <a href="#" class="nav-link">
                             <i class="nav-icon fas fa-clipboard-list"></i>
                             <p>
                                 게시판
@@ -183,7 +183,7 @@
                     
                     <!-- 조직도 -->
                     <li class="nav-item">
-                        <a href="/organization" th:classappend="${#request.requestURI == '/organization' ? 'active' : ''}" class="nav-link">
+                        <a href="/organization" class="nav-link">
                             <i class="nav-icon fas fa-sitemap"></i>
                             <p>조직도</p>
                         </a>
@@ -191,7 +191,7 @@
                     
                     <!-- 근태관리 -->
                     <li class="nav-item">
-                        <a href="/attendance" th:classappend="${#request.requestURI == '/attendance' ? 'active' : ''}" class="nav-link">
+                        <a href="/attendance" class="nav-link">
                             <i class="nav-icon fas fa-calendar-check"></i>
                             <p>근태관리</p>
                         </a>

@@ -14,7 +14,27 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <div th:replace="~{layout/base :: content-header(pageTitle='게시글 상세')"></div>
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">게시글 상세</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">홈</a></li>
+                        <li class="breadcrumb-item">게시판</li>
+                        <li class="breadcrumb-item active">게시글 상세</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
     
     <div class="card">
         <!-- 게시글 헤더 -->
@@ -39,7 +59,8 @@
                 <div class="col-md-6">
                     <strong>작성자:</strong> 
                     <span th:text="${post?.writer?.name}">홍길동</span>
-                    <span class="text-muted" th:text="'(' + ${post?.writer?.department?.name} + ')'"></span>
+                    <span class="text-muted" th:if="${post?.writer?.department}" 
+                          th:text="'(' + ${post.writer.department.deptName} + ')'"></span>
                 </div>
                 <div class="col-md-6 text-md-right">
                     <strong>작성일:</strong> 
@@ -94,7 +115,7 @@
     </div>
     
     <!-- 댓글 영역 -->
-    <div class="card mt-3" th:if="${post?.allowComment}">
+    <div class="card mt-3">
         <div class="card-header">
             <h5 class="card-title mb-0">
                 <i class="fas fa-comments"></i> 댓글 
@@ -172,6 +193,9 @@
             </div>
         </div>
     </div>
+    
+        </div>
+    </section>
 </div>
 
 <th:block layout:fragment="scripts">

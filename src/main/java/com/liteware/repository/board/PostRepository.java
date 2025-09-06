@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     
     Page<Post> findByBoardAndIsDeletedFalse(Board board, Pageable pageable);
     
-    @Query("SELECT p FROM Post p JOIN FETCH p.board JOIN FETCH p.writer WHERE p.postId = :postId")
+    @Query("SELECT p FROM Post p JOIN FETCH p.board JOIN FETCH p.writer w LEFT JOIN FETCH w.department LEFT JOIN FETCH p.attachments WHERE p.postId = :postId")
     Optional<Post> findByIdWithBoardAndWriter(@Param("postId") Long postId);
     
     @Query("SELECT p FROM Post p WHERE p.board = :board AND p.isNotice = :isNotice " +
@@ -60,4 +61,15 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT p FROM Post p WHERE p.board = :board AND p.isDeleted = false " +
            "ORDER BY p.likeCount DESC, p.createdAt DESC")
     Page<Post> findByBoardOrderByLikeCount(@Param("board") Board board, Pageable pageable);
+    
+    @Query("SELECT p FROM Post p WHERE p.isNotice = true AND p.isDeleted = false " +
+           "ORDER BY p.createdAt DESC")
+    List<Post> findRecentNotices(Pageable pageable);
+    
+    @Query("SELECT p FROM Post p WHERE p.isDeleted = false " +
+           "ORDER BY p.createdAt DESC")
+    List<Post> findRecentPosts(Pageable pageable);
+    
+    @Query("SELECT COUNT(p) FROM Post p WHERE p.createdAt >= :startDate AND p.isDeleted = false")
+    Long countPostsCreatedAfter(@Param("startDate") LocalDateTime startDate);
 }

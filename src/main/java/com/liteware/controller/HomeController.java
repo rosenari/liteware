@@ -39,15 +39,32 @@ public class HomeController {
         Long userId = 1L; // getUserIdFromUserDetails(userDetails);
         
         try {
+            // 결재 관련 데이터
             model.addAttribute("pendingApprovals", approvalService.countPendingDocuments(userId));
             model.addAttribute("draftedDocuments", approvalService.getDraftedDocuments(userId).size());
+            model.addAttribute("recentDocuments", approvalService.getRecentDocuments(userId, 5));
+            
+            // 게시판 관련 데이터
             model.addAttribute("recentBoards", boardService.getActiveBoards());
-            // model.addAttribute("notices", boardService.getRecentNotices());
+            model.addAttribute("notices", boardService.getRecentNotices(5));
+            model.addAttribute("recentPosts", boardService.getRecentPosts(5));
+            model.addAttribute("newPostsCount", boardService.countNewPostsToday());
+            
+            // 사용자 정보
+            model.addAttribute("username", userDetails.getUsername());
+            model.addAttribute("userId", userId);
+            
+            // 오늘 날짜 (근태 및 일정 관련)
+            model.addAttribute("today", java.time.LocalDate.now());
+            model.addAttribute("currentTime", java.time.LocalTime.now());
+            
         } catch (Exception e) {
             log.error("Dashboard data loading error", e);
+            // 에러 발생시 빈 데이터라도 전달
+            model.addAttribute("pendingApprovals", 0);
+            model.addAttribute("draftedDocuments", 0);
+            model.addAttribute("newPostsCount", 0L);
         }
-        
-        model.addAttribute("username", userDetails.getUsername());
         
         return "dashboard/index";
     }

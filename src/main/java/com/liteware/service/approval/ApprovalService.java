@@ -11,7 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -281,6 +283,16 @@ public class ApprovalService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         
         return documentRepository.findApprovedDocumentsByApprover(user);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ApprovalDocument> getRecentDocuments(Long userId, int limit) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        
+        // 사용자와 관련된 최근 문서 조회 (기안자 또는 결재자)
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return documentRepository.findRecentDocumentsByUser(user, pageable);
     }
     
     public ApprovalDocument updateDocument(Long docId, ApprovalDocumentDto dto) {

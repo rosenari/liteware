@@ -7,7 +7,26 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <div th:replace="~{layout/base :: content-header(pageTitle='대시보드')}"></div>
+    <!-- Content Header -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1 class="m-0">대시보드</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="/">홈</a></li>
+                        <li class="breadcrumb-item active">대시보드</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <section class="content">
+        <div class="container-fluid">
     
     <!-- 상단 요약 카드 -->
     <div class="row">
@@ -47,8 +66,8 @@
         <div class="col-lg-3 col-6">
             <div class="small-box bg-warning">
                 <div class="inner">
-                    <h3>12</h3>
-                    <p>새 게시글</p>
+                    <h3 th:text="${newPostsCount != null ? newPostsCount : 0}">0</h3>
+                    <p>오늘의 새 게시글</p>
                 </div>
                 <div class="icon">
                     <i class="fas fa-clipboard-list"></i>
@@ -103,33 +122,21 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1.</td>
-                                <td>휴가신청서 - 연차휴가</td>
-                                <td>김철수</td>
-                                <td><span class="badge badge-pending">대기</span></td>
-                                <td>2025.01.05</td>
+                            <tr th:each="doc, iter : ${recentDocuments}" th:if="${iter.index < 5}">
+                                <td th:text="${iter.count} + '.'">1.</td>
+                                <td>
+                                    <a th:href="@{/approval/{id}(id=${doc.docId})}" th:text="${doc.title}">문서 제목</a>
+                                </td>
+                                <td th:text="${doc.drafter?.name}">기안자</td>
+                                <td>
+                                    <span class="badge" 
+                                          th:classappend="${doc.status.name() == 'PENDING' ? 'badge-warning' : (doc.status.name() == 'APPROVED' ? 'badge-success' : (doc.status.name() == 'REJECTED' ? 'badge-danger' : 'badge-secondary'))}"
+                                          th:text="${doc.status.description}">상태</span>
+                                </td>
+                                <td th:text="${#temporals.format(doc.createdAt, 'yyyy.MM.dd')}">작성일</td>
                             </tr>
-                            <tr>
-                                <td>2.</td>
-                                <td>출장보고서 - 서울지사</td>
-                                <td>이영희</td>
-                                <td><span class="badge badge-approved">승인</span></td>
-                                <td>2025.01.04</td>
-                            </tr>
-                            <tr>
-                                <td>3.</td>
-                                <td>경비청구서 - 회식비</td>
-                                <td>박민수</td>
-                                <td><span class="badge badge-pending">대기</span></td>
-                                <td>2025.01.04</td>
-                            </tr>
-                            <tr>
-                                <td>4.</td>
-                                <td>구매요청서 - 사무용품</td>
-                                <td>정수진</td>
-                                <td><span class="badge badge-rejected">반려</span></td>
-                                <td>2025.01.03</td>
+                            <tr th:if="${recentDocuments == null or recentDocuments.empty}">
+                                <td colspan="5" class="text-center text-muted">최근 결재 문서가 없습니다.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -162,29 +169,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>📌</td>
-                                <td>2025년 신년사</td>
-                                <td>대표이사</td>
-                                <td>2025.01.02</td>
+                            <tr th:each="notice, iter : ${notices}" th:if="${iter.index < 5}">
+                                <td th:text="${notice.isPinned ? '📌' : (iter.count + '.')}">1.</td>
+                                <td>
+                                    <a th:href="@{/board/{boardId}/post/{postId}(boardId=${notice.board?.boardId}, postId=${notice.postId})}" 
+                                       th:text="${notice.title}">제목</a>
+                                </td>
+                                <td th:text="${notice.writer?.name}">작성자</td>
+                                <td th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}">작성일</td>
                             </tr>
-                            <tr>
-                                <td>1.</td>
-                                <td>1월 정기 시스템 점검 안내</td>
-                                <td>IT팀</td>
-                                <td>2025.01.05</td>
-                            </tr>
-                            <tr>
-                                <td>2.</td>
-                                <td>2025년 상반기 교육 일정</td>
-                                <td>인사팀</td>
-                                <td>2025.01.04</td>
-                            </tr>
-                            <tr>
-                                <td>3.</td>
-                                <td>사내 카페테리아 운영 시간 변경</td>
-                                <td>총무팀</td>
-                                <td>2025.01.03</td>
+                            <tr th:if="${notices == null or notices.empty}">
+                                <td colspan="4" class="text-center text-muted">공지사항이 없습니다.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -210,7 +205,7 @@
                                 <span class="info-box-icon bg-success"><i class="fas fa-sign-in-alt"></i></span>
                                 <div class="info-box-content">
                                     <span class="info-box-text">출근 시간</span>
-                                    <span class="info-box-number">08:52</span>
+                                    <span class="info-box-number" th:text="${#temporals.format(currentTime, 'HH:mm')}">08:52</span>
                                 </div>
                             </div>
                         </div>
@@ -339,6 +334,9 @@
             </div>
         </div>
     </div>
+    
+        </div>
+    </section>
 </div>
 
 <th:block layout:fragment="scripts">

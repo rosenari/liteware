@@ -9,6 +9,7 @@
 .classpath
 .claude/
 .mcp.json
+.playwright-mcp/
 
 # Gradle
 .gradle/

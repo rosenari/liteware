@@ -5,10 +5,13 @@ import com.liteware.model.entity.Position;
 import com.liteware.model.entity.Role;
 import com.liteware.model.entity.User;
 import com.liteware.model.entity.UserStatus;
+import com.liteware.model.entity.board.Board;
+import com.liteware.model.entity.board.BoardType;
 import com.liteware.repository.DepartmentRepository;
 import com.liteware.repository.PositionRepository;
 import com.liteware.repository.RoleRepository;
 import com.liteware.repository.UserRepository;
+import com.liteware.repository.board.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -35,6 +38,7 @@ public class DataInitializer {
             DepartmentRepository departmentRepository,
             PositionRepository positionRepository,
             RoleRepository roleRepository,
+            BoardRepository boardRepository,
             PasswordEncoder passwordEncoder
     ) {
         return args -> {
@@ -247,6 +251,75 @@ public class DataInitializer {
                 userRepository.save(hrUser);
                 
                 log.info("Created {} users", 5);
+            }
+            
+            // 게시판 생성
+            if (boardRepository.count() == 0) {
+                Board noticeBoard = Board.builder()
+                    .boardName("공지사항")
+                    .boardCode("NOTICE")
+                    .boardType(BoardType.NOTICE)
+                    .description("회사 공지사항 게시판")
+                    .sortOrder(1)
+                    .useYn(true)
+                    .noticeYn(true)
+                    .secretYn(false)
+                    .attachmentYn(true)
+                    .writeAuthLevel(3)  // ADMIN level
+                    .readAuthLevel(1)   // USER level
+                    .commentAuthLevel(1) // USER level
+                    .build();
+                boardRepository.save(noticeBoard);
+                
+                Board freeBoard = Board.builder()
+                    .boardName("자유게시판")
+                    .boardCode("FREE")
+                    .boardType(BoardType.GENERAL)
+                    .description("자유롭게 소통하는 게시판")
+                    .sortOrder(2)
+                    .useYn(true)
+                    .noticeYn(false)
+                    .secretYn(false)
+                    .attachmentYn(true)
+                    .writeAuthLevel(1)   // USER level
+                    .readAuthLevel(1)    // USER level
+                    .commentAuthLevel(1) // USER level
+                    .build();
+                boardRepository.save(freeBoard);
+                
+                Board resourceBoard = Board.builder()
+                    .boardName("자료실")
+                    .boardCode("RESOURCE")
+                    .boardType(BoardType.DATA)
+                    .description("업무 자료 공유 게시판")
+                    .sortOrder(3)
+                    .useYn(true)
+                    .noticeYn(false)
+                    .secretYn(false)
+                    .attachmentYn(true)
+                    .writeAuthLevel(1)   // USER level
+                    .readAuthLevel(1)    // USER level
+                    .commentAuthLevel(1) // USER level
+                    .build();
+                boardRepository.save(resourceBoard);
+                
+                Board qnaBoard = Board.builder()
+                    .boardName("Q&A")
+                    .boardCode("QNA")
+                    .boardType(BoardType.QNA)
+                    .description("질문과 답변 게시판")
+                    .sortOrder(4)
+                    .useYn(true)
+                    .noticeYn(false)
+                    .secretYn(false)
+                    .attachmentYn(true)
+                    .writeAuthLevel(1)   // USER level
+                    .readAuthLevel(1)    // USER level
+                    .commentAuthLevel(1) // USER level
+                    .build();
+                boardRepository.save(qnaBoard);
+                
+                log.info("Created {} boards", 4);
             }
             
             log.info("Test data initialization completed!");

@@ -60,17 +60,29 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Static resources and public pages
                 .requestMatchers("/", "/index.html", "/static/**", "/public/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/images/**", "/fonts/**").permitAll()
+                .requestMatchers("/favicon.ico", "/error").permitAll()
+                
+                // Authentication endpoints
+                .requestMatchers("/login", "/signup", "/logout", "/forgot-password").permitAll()
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/signup", "/api/v1/forgot-password").permitAll()
+                
+                // Development and monitoring endpoints
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/api/test/**").permitAll()  // 테스트 데이터 생성 API
+                
+                // Role-based access control
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/manager/**").hasAnyRole("ADMIN", "MANAGER")
-                .requestMatchers("/api/**").authenticated()  // 모든 API는 인증 필요
-                .requestMatchers("/login", "/signup", "/logout", "/forgot-password").permitAll()  // 페이지 접근 허용
+                
+                // All other API endpoints require authentication
+                .requestMatchers("/api/**").authenticated()
+                
+                // All other requests require authentication
                 .anyRequest().authenticated()
             )
             .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));

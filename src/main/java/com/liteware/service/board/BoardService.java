@@ -11,11 +11,14 @@ import com.liteware.repository.board.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -111,7 +114,7 @@ public class BoardService {
         postRepository.delete(post);
     }
     
-    @Transactional(readOnly = true)
+    @Transactional
     public Post getPost(Long postId) {
         Post post = postRepository.findByIdWithBoardAndWriter(postId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
@@ -122,7 +125,7 @@ public class BoardService {
         return post;
     }
     
-    @Transactional(readOnly = true)
+    @Transactional
     public Post getPost(Long postId, Long userId) {
         Post post = postRepository.findByIdWithBoardAndWriter(postId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
@@ -181,5 +184,23 @@ public class BoardService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         
         return postRepository.findByWriter(user, pageable);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<Post> getRecentNotices(int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return postRepository.findRecentNotices(pageable);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<Post> getRecentPosts(int limit) {
+        Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return postRepository.findRecentPosts(pageable);
+    }
+    
+    @Transactional(readOnly = true)
+    public Long countNewPostsToday() {
+        LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
+        return postRepository.countPostsCreatedAfter(startOfDay);
     }
 }
