@@ -154,19 +154,7 @@ public class BoardService {
     
     @Transactional(readOnly = true)
     public Page<Post> searchPosts(String keyword, Pageable pageable) {
-        Page<Post> posts = postRepository.searchPosts(keyword, pageable);
-        
-        // Writer 정보를 명시적으로 로드
-        posts.getContent().forEach(post -> {
-            if (post.getWriter() != null) {
-                post.getWriter().getName(); // Lazy loading 강제 초기화
-                if (post.getWriter().getDepartment() != null) {
-                    post.getWriter().getDepartment().getDeptName(); // Department도 초기화
-                }
-            }
-        });
-        
-        return posts;
+        return postRepository.searchPosts(keyword, pageable);
     }
     
     @Transactional(readOnly = true)
@@ -202,37 +190,13 @@ public class BoardService {
     @Transactional(readOnly = true)
     public List<Post> getRecentNotices(int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
-        List<Post> posts = postRepository.findRecentNotices(pageable);
-        
-        // Writer 정보를 명시적으로 로드
-        posts.forEach(post -> {
-            if (post.getWriter() != null) {
-                post.getWriter().getName(); // Lazy loading 강제 초기화
-                if (post.getWriter().getDepartment() != null) {
-                    post.getWriter().getDepartment().getDeptName(); // Department도 초기화
-                }
-            }
-        });
-        
-        return posts;
+        return postRepository.findRecentNotices(pageable);
     }
     
     @Transactional(readOnly = true)
     public List<Post> getRecentPosts(int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
-        List<Post> posts = postRepository.findRecentPosts(pageable);
-        
-        // Writer 정보를 명시적으로 로드
-        posts.forEach(post -> {
-            if (post.getWriter() != null) {
-                post.getWriter().getName(); // Lazy loading 강제 초기화
-                if (post.getWriter().getDepartment() != null) {
-                    post.getWriter().getDepartment().getDeptName(); // Department도 초기화
-                }
-            }
-        });
-        
-        return posts;
+        return postRepository.findRecentPosts(pageable);
     }
     
     @Transactional(readOnly = true)
