@@ -37,10 +37,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
         
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+        return Jwts.builder().subject(username).issuedAt(now).expiration(expiryDate)
                 .signWith(key)
                 .compact();
     }
@@ -53,11 +50,8 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + accessTokenExpiration);
         
-        return Jwts.builder()
-                .setSubject(authentication.getName())
-                .claim("auth", authorities)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+        return Jwts.builder().subject(authentication.getName())
+                .claim("auth", authorities).issuedAt(now).expiration(expiryDate)
                 .signWith(key)
                 .compact();
     }
@@ -66,10 +60,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + refreshTokenExpiration);
         
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(expiryDate)
+        return Jwts.builder().subject(username).issuedAt(now).expiration(expiryDate)
                 .signWith(key)
                 .compact();
     }
