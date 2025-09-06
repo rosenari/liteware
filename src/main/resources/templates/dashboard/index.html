@@ -271,7 +271,7 @@
                             </thead>
                             <tbody>
                                 <tr th:each="notice, iter : ${notices}" th:if="${iter.index < 5}">
-                                    <td th:text="${notice.isPinned ? '📌' : (iter.count + '.')}">1.</td>
+                                    <td th:text="${notice.isNotice ? '📌' : (iter.count + '.')}">1.</td>
                                     <td>
                                         <a th:href="@{/board/{boardId}/post/{postId}(boardId=${notice.board?.boardId}, postId=${notice.postId})}" 
                                            th:text="${notice.title.length() > 15 ? notice.title.substring(0, 15) + '...' : notice.title}"
