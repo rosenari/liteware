@@ -24,10 +24,33 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     
     Page<Post> findByBoardAndIsDeletedFalse(Board board, Pageable pageable);
     
+    @Query(value = "SELECT p.*, u.name as writer_name, d.dept_name " +
+                  "FROM posts p " +
+                  "LEFT JOIN users u ON p.writer_id = u.user_id " +
+                  "LEFT JOIN departments d ON u.department_id = d.dept_id " +
+                  "WHERE p.board_id = :boardId AND p.is_deleted = false AND p.is_notice = false " +
+                  "ORDER BY p.created_at DESC",
+           countQuery = "SELECT COUNT(*) FROM posts p WHERE p.board_id = :boardId AND p.is_deleted = false AND p.is_notice = false",
+           nativeQuery = true)
+    Page<Post> findByBoardWithWriterNative(@Param("boardId") Long boardId, Pageable pageable);
+    
     @Query("SELECT p FROM Post p JOIN FETCH p.board JOIN FETCH p.writer w LEFT JOIN FETCH w.department LEFT JOIN FETCH p.attachments WHERE p.postId = :postId")
     Optional<Post> findByIdWithBoardAndWriter(@Param("postId") Long postId);
     
-    @Query("SELECT p FROM Post p WHERE p.board = :board AND p.isNotice = :isNotice " +
+    @Query("SELECT new com.liteware.model.dto.PostSummaryDto(" +
+           "p.postId, p.title, u.name, d.deptName, p.viewCount, p.likeCount, " +
+           "p.isNotice, p.isSecret, p.createdAt, p.updatedAt, " +
+           "(SELECT COUNT(c) FROM Comment c WHERE c.post = p AND c.isDeleted = false)) " +
+           "FROM Post p " +
+           "LEFT JOIN p.writer u " +
+           "LEFT JOIN u.department d " +
+           "WHERE p.board = :board AND p.isNotice = :isNotice " +
+           "AND p.isDeleted = false ORDER BY p.createdAt DESC")
+    List<com.liteware.model.dto.PostSummaryDto> findNoticeSummaryByBoard(@Param("board") Board board, 
+                                                          @Param("isNotice") Boolean isNotice);
+    
+    @Query("SELECT p FROM Post p JOIN FETCH p.writer w LEFT JOIN FETCH w.department " +
+           "WHERE p.board = :board AND p.isNotice = :isNotice " +
            "AND p.isDeleted = false ORDER BY p.createdAt DESC")
     List<Post> findByBoardAndIsNoticeOrderByCreatedAtDesc(@Param("board") Board board, 
                                                           @Param("isNotice") Boolean isNotice);
@@ -37,7 +60,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
            "AND p.isDeleted = false ORDER BY p.createdAt DESC")
     List<Post> findActiveNotices(@Param("board") Board board, @Param("today") LocalDate today);
     
-    @Query("SELECT p FROM Post p WHERE (p.title LIKE %:keyword% OR p.content LIKE %:keyword%) " +
+    @Query("SELECT p FROM Post p " +
+           "WHERE (p.title LIKE %:keyword% OR p.content LIKE %:keyword%) " +
            "AND p.isDeleted = false")
     Page<Post> searchPosts(@Param("keyword") String keyword, Pageable pageable);
     
@@ -62,11 +86,13 @@ public interface PostRepository extends JpaRepository<Post, Long> {
            "ORDER BY p.likeCount DESC, p.createdAt DESC")
     Page<Post> findByBoardOrderByLikeCount(@Param("board") Board board, Pageable pageable);
     
-    @Query("SELECT p FROM Post p WHERE p.isNotice = true AND p.isDeleted = false " +
+    @Query("SELECT p FROM Post p JOIN FETCH p.writer w LEFT JOIN FETCH w.department " +
+           "WHERE p.isNotice = true AND p.isDeleted = false " +
            "ORDER BY p.createdAt DESC")
     List<Post> findRecentNotices(Pageable pageable);
     
-    @Query("SELECT p FROM Post p WHERE p.isDeleted = false " +
+    @Query("SELECT p FROM Post p JOIN FETCH p.writer w LEFT JOIN FETCH w.department " +
+           "WHERE p.isDeleted = false " +
            "ORDER BY p.createdAt DESC")
     List<Post> findRecentPosts(Pageable pageable);
     

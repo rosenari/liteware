@@ -93,7 +93,32 @@ public class CommentService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다"));
         
-        return commentRepository.findByPostOrderByParentCommentAscCreatedAtAsc(post);
+        // 모든 댓글을 조회한 후 계층 구조로 재구성
+        List<Comment> allComments = commentRepository.findByPostWithWriter(post);
+        
+        // 부모 댓글들만 필터링하고, 각 부모 댓글에 대댓글 연결
+        List<Comment> rootComments = new java.util.ArrayList<>();
+        java.util.Map<Long, Comment> commentMap = new java.util.HashMap<>();
+        
+        // 댓글을 맵에 저장
+        for (Comment comment : allComments) {
+            commentMap.put(comment.getCommentId(), comment);
+            if (comment.getParentComment() == null) {
+                rootComments.add(comment);
+            }
+        }
+        
+        // 대댓글을 부모 댓글의 childComments에 추가
+        for (Comment comment : allComments) {
+            if (comment.getParentComment() != null) {
+                Comment parent = commentMap.get(comment.getParentComment().getCommentId());
+                if (parent != null) {
+                    parent.getChildComments().add(comment);
+                }
+            }
+        }
+        
+        return rootComments;
     }
     
     @Transactional(readOnly = true)

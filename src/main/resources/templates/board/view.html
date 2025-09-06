@@ -162,8 +162,8 @@
                     </div>
                     
                     <!-- 대댓글 -->
-                    <div class="comment-reply mt-2" th:if="${comment.replies != null and !comment.replies.isEmpty()}">
-                        <div th:each="reply : ${comment.replies}">
+                    <div class="comment-reply mt-2" th:if="${comment.childComments != null and !comment.childComments.isEmpty()}">
+                        <div th:each="reply : ${comment.childComments}">
                             <strong th:text="${reply.writer?.name}">이영희</strong>
                             <span class="text-muted ml-2" 
                                   th:text="${#temporals.format(reply.createdAt, 'yyyy.MM.dd HH:mm')}"></span>
@@ -252,7 +252,7 @@ function submitReply(commentId) {
     
     var replyData = {
         content: content,
-        parentId: commentId,
+        parentCommentId: commentId,
         postId: [[${post?.postId}]]
     };
     

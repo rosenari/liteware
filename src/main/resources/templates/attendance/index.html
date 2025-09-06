@@ -61,14 +61,18 @@
                             <div class="row">
                                 <div class="col-6">
                                     <form method="post" action="/attendance/checkin">
-                                        <button type="submit" class="btn btn-success btn-block">
+                                        <button type="submit" class="btn btn-success btn-block" 
+                                                th:disabled="${isCheckedIn}" 
+                                                th:text="${isCheckedIn ? '출근완료' : '출근'}">
                                             <i class="fas fa-sign-in-alt"></i> 출근
                                         </button>
                                     </form>
                                 </div>
                                 <div class="col-6">
                                     <form method="post" action="/attendance/checkout">
-                                        <button type="submit" class="btn btn-danger btn-block">
+                                        <button type="submit" class="btn btn-danger btn-block" 
+                                                th:disabled="${!isCheckedIn or isCheckedOut}"
+                                                th:text="${isCheckedOut ? '퇴근완료' : '퇴근'}">
                                             <i class="fas fa-sign-out-alt"></i> 퇴근
                                         </button>
                                     </form>
@@ -125,45 +129,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>2025-09-02</td>
-                                        <td>월</td>
-                                        <td>09:00</td>
-                                        <td>18:30</td>
-                                        <td>8시간 30분</td>
-                                        <td><span class="badge badge-success">정상</span></td>
+                                    <tr th:each="attendance : ${weeklyAttendance}" 
+                                        th:class="${attendance.workDate == #dates.createToday() ? 'table-active' : ''}">
+                                        <td th:text="${#temporals.format(attendance.workDate, 'yyyy-MM-dd')}">2025-09-06</td>
+                                        <td th:text="${attendance.workDate.dayOfWeek.getDisplayName(T(java.time.format.TextStyle).SHORT, T(java.util.Locale).KOREAN)}">금</td>
+                                        <td th:text="${attendance.checkInTime != null ? #temporals.format(attendance.checkInTime, 'HH:mm') : '-'}">09:00</td>
+                                        <td th:text="${attendance.checkOutTime != null ? #temporals.format(attendance.checkOutTime, 'HH:mm') : '-'}">18:30</td>
+                                        <td th:text="${attendance.checkOutTime != null ? attendance.formattedWorkingHours : (attendance.checkInTime != null ? '근무중' : '-')}">8시간 30분</td>
+                                        <td>
+                                            <span th:if="${@attendanceService.getAttendanceStatus(attendance) != ''}"
+                                                  class="badge" 
+                                                  th:classappend="${@attendanceService.getStatusBadgeClass(@attendanceService.getAttendanceStatus(attendance))}"
+                                                  th:text="${@attendanceService.getAttendanceStatus(attendance)}">출근</span>
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>2025-09-03</td>
-                                        <td>화</td>
-                                        <td>09:05</td>
-                                        <td>18:00</td>
-                                        <td>7시간 55분</td>
-                                        <td><span class="badge badge-warning">지각</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2025-09-04</td>
-                                        <td>수</td>
-                                        <td>09:00</td>
-                                        <td>19:00</td>
-                                        <td>9시간</td>
-                                        <td><span class="badge badge-success">정상</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>2025-09-05</td>
-                                        <td>목</td>
-                                        <td>09:00</td>
-                                        <td>18:30</td>
-                                        <td>8시간 30분</td>
-                                        <td><span class="badge badge-success">정상</span></td>
-                                    </tr>
-                                    <tr class="table-active">
-                                        <td>2025-09-06</td>
-                                        <td>금</td>
-                                        <td>09:00</td>
-                                        <td>-</td>
-                                        <td>근무중</td>
-                                        <td><span class="badge badge-info">근무중</span></td>
+                                    <tr th:if="${weeklyAttendance == null or weeklyAttendance.empty}">
+                                        <td colspan="6" class="text-center text-muted py-3">근태 기록이 없습니다.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -179,50 +160,27 @@
                         </div>
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-3 col-sm-6 col-12">
+                                <div class="col-md-4 col-sm-6 col-12">
                                     <div class="info-box">
                                         <span class="info-box-icon bg-success">
                                             <i class="fas fa-check"></i>
                                         </span>
                                         <div class="info-box-content">
-                                            <span class="info-box-text">정상 출근</span>
-                                            <span class="info-box-number">18일</span>
+                                            <span class="info-box-text">출근일수</span>
+                                            <span class="info-box-number" th:text="${monthlyAttendanceDays} + '일'">0일</span>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-3 col-sm-6 col-12">
+                                
+                                <div class="col-md-4 col-sm-6 col-12">
                                     <div class="info-box">
-                                        <span class="info-box-icon bg-warning">
+                                        <span class="info-box-icon bg-info">
                                             <i class="fas fa-clock"></i>
                                         </span>
                                         <div class="info-box-content">
-                                            <span class="info-box-text">지각</span>
-                                            <span class="info-box-number">2일</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-3 col-sm-6 col-12">
-                                    <div class="info-box">
-                                        <span class="info-box-icon bg-info">
-                                            <i class="fas fa-plane"></i>
-                                        </span>
-                                        <div class="info-box-content">
-                                            <span class="info-box-text">연차</span>
-                                            <span class="info-box-number">2일</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="col-md-3 col-sm-6 col-12">
-                                    <div class="info-box">
-                                        <span class="info-box-icon bg-danger">
-                                            <i class="fas fa-times"></i>
-                                        </span>
-                                        <div class="info-box-content">
-                                            <span class="info-box-text">결근</span>
-                                            <span class="info-box-number">0일</span>
+                                            <span class="info-box-text">총 근무시간</span>
+                                            <span class="info-box-number" th:text="${monthlyWorkingHours}">0시간 0분</span>
                                         </div>
                                     </div>
                                 </div>

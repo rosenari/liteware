@@ -145,15 +145,28 @@ public class BoardService {
     
     @Transactional(readOnly = true)
     public Page<Post> getPostsByBoard(Long boardId, Pageable pageable) {
+        log.info("getPostsByBoard");
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("게시판을 찾을 수 없습니다"));
         
-        return postRepository.findByBoard(board, pageable);
+        return postRepository.findByBoardAndIsDeletedFalse(board, pageable);
     }
     
     @Transactional(readOnly = true)
     public Page<Post> searchPosts(String keyword, Pageable pageable) {
-        return postRepository.searchPosts(keyword, pageable);
+        Page<Post> posts = postRepository.searchPosts(keyword, pageable);
+        
+        // Writer 정보를 명시적으로 로드
+        posts.getContent().forEach(post -> {
+            if (post.getWriter() != null) {
+                post.getWriter().getName(); // Lazy loading 강제 초기화
+                if (post.getWriter().getDepartment() != null) {
+                    post.getWriter().getDepartment().getDeptName(); // Department도 초기화
+                }
+            }
+        });
+        
+        return posts;
     }
     
     @Transactional(readOnly = true)
@@ -189,18 +202,50 @@ public class BoardService {
     @Transactional(readOnly = true)
     public List<Post> getRecentNotices(int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return postRepository.findRecentNotices(pageable);
+        List<Post> posts = postRepository.findRecentNotices(pageable);
+        
+        // Writer 정보를 명시적으로 로드
+        posts.forEach(post -> {
+            if (post.getWriter() != null) {
+                post.getWriter().getName(); // Lazy loading 강제 초기화
+                if (post.getWriter().getDepartment() != null) {
+                    post.getWriter().getDepartment().getDeptName(); // Department도 초기화
+                }
+            }
+        });
+        
+        return posts;
     }
     
     @Transactional(readOnly = true)
     public List<Post> getRecentPosts(int limit) {
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return postRepository.findRecentPosts(pageable);
+        List<Post> posts = postRepository.findRecentPosts(pageable);
+        
+        // Writer 정보를 명시적으로 로드
+        posts.forEach(post -> {
+            if (post.getWriter() != null) {
+                post.getWriter().getName(); // Lazy loading 강제 초기화
+                if (post.getWriter().getDepartment() != null) {
+                    post.getWriter().getDepartment().getDeptName(); // Department도 초기화
+                }
+            }
+        });
+        
+        return posts;
     }
     
     @Transactional(readOnly = true)
     public Long countNewPostsToday() {
         LocalDateTime startOfDay = LocalDateTime.now().toLocalDate().atStartOfDay();
         return postRepository.countPostsCreatedAfter(startOfDay);
+    }
+    
+    /**
+     * 전체 게시글 수 조회
+     */
+    @Transactional(readOnly = true)
+    public long getTotalPostsCount() {
+        return postRepository.count();
     }
 }

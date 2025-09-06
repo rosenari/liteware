@@ -73,4 +73,9 @@ public interface ApprovalDocumentRepository extends JpaRepository<ApprovalDocume
            "AND d.isDeleted = false " +
            "ORDER BY d.createdAt DESC")
     List<ApprovalDocument> findRecentDocumentsByUser(@Param("user") User user, Pageable pageable);
+    
+    /**
+     * 특정 상태의 문서 수 조회
+     */
+    long countByStatus(DocumentStatus status);
 }

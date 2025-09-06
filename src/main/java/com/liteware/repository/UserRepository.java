@@ -69,4 +69,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
            "LEFT JOIN FETCH u.roles " +
            "WHERE u.isDeleted = false")
     List<User> findAllWithFullInfo();
+    
+    /**
+     * 특정 상태의 사용자 수 조회
+     */
+    long countByStatus(com.liteware.model.entity.UserStatus status);
 }

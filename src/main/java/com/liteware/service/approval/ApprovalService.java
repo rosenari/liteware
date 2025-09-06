@@ -310,4 +310,12 @@ public class ApprovalService {
         
         return documentRepository.save(document);
     }
+    
+    /**
+     * 전체 승인된 결재 문서 수 조회
+     */
+    @Transactional(readOnly = true)
+    public long getTotalApprovedCount() {
+        return documentRepository.countByStatus(DocumentStatus.APPROVED);
+    }
 }

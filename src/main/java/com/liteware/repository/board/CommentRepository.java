@@ -41,6 +41,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findRootCommentsByPost(@Param("post") Post post);
     
     @Query("SELECT c FROM Comment c JOIN FETCH c.writer " +
-           "WHERE c.post = :post AND c.isDeleted = false")
+           "WHERE c.post = :post AND c.isDeleted = false " +
+           "ORDER BY COALESCE(c.parentComment.commentId, c.commentId), c.createdAt")
     List<Comment> findByPostWithWriter(@Param("post") Post post);
 }

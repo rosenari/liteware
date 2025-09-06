@@ -2,8 +2,10 @@ package com.liteware.controller;
 
 import com.liteware.model.dto.CommentDto;
 import com.liteware.model.dto.PostDto;
+import com.liteware.model.entity.User;
 import com.liteware.model.entity.board.Board;
 import com.liteware.model.entity.board.Post;
+import com.liteware.repository.UserRepository;
 import com.liteware.service.board.BoardService;
 import com.liteware.service.board.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,14 @@ public class BoardController {
     
     private final BoardService boardService;
     private final CommentService commentService;
+    private final UserRepository userRepository;
+    
+    private User getCurrentUser(UserDetails userDetails) {
+        if (userDetails == null) {
+            return null;
+        }
+        return userRepository.findByLoginId(userDetails.getUsername()).orElse(null);
+    }
     
     @GetMapping
     public String boardList(Model model) {
@@ -41,14 +51,15 @@ public class BoardController {
                           Model model) {
         
         PageRequest pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<Post> posts;
         
+        Page<Post> posts;
         if (keyword != null && !keyword.isEmpty()) {
             posts = boardService.searchPosts(keyword, pageable);
             model.addAttribute("keyword", keyword);
         } else {
             posts = boardService.getPostsByBoard(boardId, pageable);
         }
+        model.addAttribute("posts", posts);
         
         try {
             model.addAttribute("board", boardService.getActiveBoards().stream()
@@ -59,7 +70,6 @@ public class BoardController {
             log.error("Board not found", e);
         }
         
-        model.addAttribute("posts", posts);
         model.addAttribute("notices", boardService.getNoticePosts(boardId));
         model.addAttribute("currentPage", page);
         
@@ -86,8 +96,13 @@ public class BoardController {
                        @AuthenticationPrincipal UserDetails userDetails,
                        RedirectAttributes redirectAttributes) {
         try {
+            User currentUser = getCurrentUser(userDetails);
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+            
             postDto.setBoardId(boardId);
-            postDto.setWriterId(1L); // TODO: Get from userDetails
+            postDto.setWriterId(currentUser.getUserId());
             
             Post post = boardService.createPost(postDto);
             redirectAttributes.addFlashAttribute("success", "게시글이 등록되었습니다.");
@@ -107,9 +122,9 @@ public class BoardController {
                           Model model) {
         try {
             Post post;
-            if (userDetails != null) {
-                Long userId = 1L; // TODO: Get from userDetails
-                post = boardService.getPost(postId, userId);
+            User currentUser = getCurrentUser(userDetails);
+            if (currentUser != null) {
+                post = boardService.getPost(postId, currentUser.getUserId());
             } else {
                 post = boardService.getPost(postId);
             }
@@ -119,9 +134,8 @@ public class BoardController {
             model.addAttribute("boardId", boardId);
             
             // 수정/삭제 권한 체크
-            if (userDetails != null) {
-                Long userId = 1L; // TODO: Get from userDetails
-                model.addAttribute("canEdit", post.getWriter().getUserId().equals(userId));
+            if (currentUser != null) {
+                model.addAttribute("canEdit", post.getWriter().getUserId().equals(currentUser.getUserId()));
             }
             
             return "board/view";
@@ -140,8 +154,8 @@ public class BoardController {
             Post post = boardService.getPost(postId);
             
             // 권한 체크
-            Long userId = 1L; // TODO: Get from userDetails
-            if (!post.getWriter().getUserId().equals(userId)) {
+            User currentUser = getCurrentUser(userDetails);
+            if (currentUser == null || !post.getWriter().getUserId().equals(currentUser.getUserId())) {
                 return "redirect:/board/" + boardId + "/post/" + postId;
             }
             
@@ -162,8 +176,11 @@ public class BoardController {
                       @AuthenticationPrincipal UserDetails userDetails,
                       RedirectAttributes redirectAttributes) {
         try {
-            Long userId = 1L; // TODO: Get from userDetails
-            boardService.updatePost(postId, postDto, userId);
+            User currentUser = getCurrentUser(userDetails);
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+            boardService.updatePost(postId, postDto, currentUser.getUserId());
             
             redirectAttributes.addFlashAttribute("success", "게시글이 수정되었습니다.");
             return "redirect:/board/" + boardId + "/post/" + postId;
@@ -180,8 +197,11 @@ public class BoardController {
                         @AuthenticationPrincipal UserDetails userDetails,
                         RedirectAttributes redirectAttributes) {
         try {
-            Long userId = 1L; // TODO: Get from userDetails
-            boardService.deletePost(postId, userId);
+            User currentUser = getCurrentUser(userDetails);
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+            boardService.deletePost(postId, currentUser.getUserId());
             
             redirectAttributes.addFlashAttribute("success", "게시글이 삭제되었습니다.");
             return "redirect:/board/" + boardId;
@@ -199,8 +219,13 @@ public class BoardController {
                             @RequestBody CommentDto commentDto,
                             @AuthenticationPrincipal UserDetails userDetails) {
         try {
+            User currentUser = getCurrentUser(userDetails);
+            if (currentUser == null) {
+                return "error";
+            }
+            
             commentDto.setPostId(postId);
-            commentDto.setWriterId(1L); // TODO: Get from userDetails
+            commentDto.setWriterId(currentUser.getUserId());
             
             commentService.createComment(commentDto);
             return "success";
