@@ -64,8 +64,10 @@ public interface ApprovalDocumentRepository extends JpaRepository<ApprovalDocume
            "AND d.status = 'PENDING'")
     Long countPendingDocuments(@Param("approver") User approver);
     
-    @Query("SELECT d FROM ApprovalDocument d WHERE d.docId = :docId")
-    Optional<ApprovalDocument> findByIdWithApprovalLines(@Param("docId") Long docId);
+    // EAGER 페칭으로 인해 JOIN FETCH가 불필요함 - JPA 기본 메서드 사용
+    default Optional<ApprovalDocument> findByIdWithApprovalLines(Long docId) {
+        return findById(docId);
+    }
 
     @Query("SELECT DISTINCT d FROM ApprovalDocument d LEFT JOIN d.approvalLines l " +
             "WHERE (d.drafter = :user OR l.approver = :user)" +

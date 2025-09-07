@@ -1010,7 +1010,7 @@ $(document).ready(function() {
     }
     
     // 결재선 로드
-    var approvalLines = /*[[${document?.approvalLines}]]*/ [];
+    var approvalLines = /*[[${approvalLinesJson}]]*/ [];
     if (approvalLines && approvalLines.length > 0) {
         $('.no-approver').remove();
         let tableHtml = '';
@@ -1019,7 +1019,7 @@ $(document).ready(function() {
             tableHtml += '<tr data-user-id="' + approver.userId + '">';
             tableHtml += '<td>' + (index + 1) + '</td>';
             tableHtml += '<td>' + approver.name + '<br>';
-            tableHtml += '<small class="text-muted">' + (approver.department?.deptName || '') + ' / ' + (approver.position?.positionName || '') + '</small>';
+            tableHtml += '<small class="text-muted">' + (approver.deptName || '') + ' / ' + (approver.positionName || '') + '</small>';
             tableHtml += '</td>';
             tableHtml += '<td><span class="badge badge-primary">결재</span></td>';
             tableHtml += '<td>';
@@ -1035,7 +1035,7 @@ $(document).ready(function() {
     }
     
     // 참조자 로드
-    var references = /*[[${document?.references}]]*/ [];
+    var references = /*[[${referencesJson}]]*/ [];
     if (references && references.length > 0) {
         selectedReferences = [];
         let refHtml = '';
@@ -1043,7 +1043,7 @@ $(document).ready(function() {
             const user = ref.user;
             selectedReferences.push(user.userId);
             refHtml += '<span class="badge badge-warning mr-1 mb-1" data-user-id="' + user.userId + '">';
-            refHtml += user.name + ' (' + (user.department?.deptName || '') + ')';
+            refHtml += user.name + ' (' + (user.deptName || '') + ')';
             refHtml += '<i class="fas fa-times ml-1" style="cursor:pointer" onclick="removeReference(' + user.userId + ')"></i>';
             refHtml += '<input type="hidden" name="referenceIds" value="' + user.userId + '">';
             refHtml += '</span>';

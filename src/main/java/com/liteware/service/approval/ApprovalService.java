@@ -5,12 +5,15 @@ import com.liteware.model.dto.ApprovalLineDto;
 import com.liteware.model.entity.User;
 import com.liteware.model.entity.approval.*;
 import com.liteware.repository.UserRepository;
+import com.liteware.repository.approval.ApprovalAttachmentRepository;
 import com.liteware.repository.approval.ApprovalDocumentRepository;
 import com.liteware.repository.approval.ApprovalLineRepository;
+import com.liteware.repository.approval.LeaveRequestRepository;
 import com.liteware.service.leave.AnnualLeaveService;
 import com.liteware.service.notification.NotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -18,10 +21,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -32,10 +43,15 @@ public class ApprovalService {
     
     private final ApprovalDocumentRepository documentRepository;
     private final ApprovalLineRepository approvalLineRepository;
+    private final ApprovalAttachmentRepository attachmentRepository;
+    private final LeaveRequestRepository leaveRequestRepository;
     private final UserRepository userRepository;
     private final ApprovalWorkflowService workflowService;
     private final AnnualLeaveService annualLeaveService;
     private final NotificationService notificationService;
+    
+    @Value("${file.upload-dir:./uploads}")
+    private String uploadPath;
     
     public ApprovalDocument createDocument(ApprovalDocumentDto dto) {
         return draftDocument(dto);
@@ -288,13 +304,9 @@ public class ApprovalService {
     
     @Transactional(readOnly = true)
     public ApprovalDocument getDocument(Long docId) {
-        ApprovalDocument document = documentRepository.findByIdWithApprovalLines(docId)
+        // EAGER 페칭으로 모든 연관 엔티티가 자동으로 로드됨
+        return documentRepository.findById(docId)
                 .orElseThrow(() -> new RuntimeException("문서를 찾을 수 없습니다"));
-        
-        // 첨부파일을 lazy하게 로드 (필요시 별도 쿼리로)
-        // Hibernate.initialize(document.getAttachments());
-        
-        return document;
     }
     
     public ApprovalDocument updateDocument(ApprovalDocument document) {
@@ -500,5 +512,57 @@ public class ApprovalService {
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
         
         return documentRepository.findDocumentsByReferenceUser(user);
+    }
+    
+    // 첨부파일 삭제
+    @Transactional
+    public void deleteAttachment(Long attachmentId) {
+        ApprovalAttachment attachment = attachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new RuntimeException("첨부파일을 찾을 수 없습니다"));
+        
+        // 실제 파일 삭제
+        try {
+            Path filePath = Paths.get(attachment.getFilePath());
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            log.error("Failed to delete file: {}", attachment.getFilePath(), e);
+        }
+        
+        attachmentRepository.delete(attachment);
+    }
+    
+    // 첨부파일 추가
+    @Transactional
+    public void addAttachment(Long documentId, MultipartFile file) {
+        ApprovalDocument document = getDocument(documentId);
+        
+        try {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            String fileExtension = StringUtils.getFilenameExtension(fileName);
+            String storedFileName = UUID.randomUUID().toString() + "." + fileExtension;
+            
+            Path uploadDir = Paths.get(uploadPath);
+            if (!Files.exists(uploadDir)) {
+                Files.createDirectories(uploadDir);
+            }
+            
+            Path filePath = uploadDir.resolve(storedFileName);
+            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+            
+            ApprovalAttachment attachment = new ApprovalAttachment();
+            attachment.setDocument(document);
+            attachment.setFileName(storedFileName);
+            attachment.setOriginalFileName(fileName);
+            attachment.setFilePath(filePath.toString());
+            attachment.setFileSize(file.getSize());
+            attachment.setMimeType(file.getContentType());
+            attachment.setUploadedBy(document.getDrafter());
+            
+            attachmentRepository.save(attachment);
+            document.getAttachments().add(attachment);
+            
+        } catch (IOException e) {
+            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다", e);
+        }
     }
 }

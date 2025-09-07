@@ -3,9 +3,7 @@ package com.liteware.controller;
 import com.google.common.collect.Sets;
 import com.liteware.model.dto.ApprovalDocumentDto;
 import com.liteware.model.dto.ApprovalLineDto;
-import com.liteware.model.entity.approval.ApprovalDocument;
-import com.liteware.model.entity.approval.DocumentType;
-import com.liteware.model.entity.approval.UrgencyType;
+import com.liteware.model.entity.approval.*;
 import com.liteware.service.approval.ApprovalService;
 import com.liteware.service.organization.DepartmentService;
 import lombok.RequiredArgsConstructor;
@@ -89,6 +87,47 @@ public class ApprovalController {
                 
                 model.addAttribute("document", document);
                 model.addAttribute("isEdit", true);
+                
+                // JavaScript 직렬화를 위한 간단한 데이터 구조 생성
+                // 결재선 데이터를 간단한 맵으로 변환
+                List<java.util.Map<String, Object>> approvalLinesData = new ArrayList<>();
+                for (ApprovalLine line : document.getApprovalLines()) {
+                    java.util.Map<String, Object> lineData = new java.util.HashMap<>();
+                    java.util.Map<String, Object> approverData = new java.util.HashMap<>();
+                    approverData.put("userId", line.getApprover().getUserId());
+                    approverData.put("name", line.getApprover().getName());
+                    approverData.put("deptName", line.getApprover().getDepartment() != null ? 
+                        line.getApprover().getDepartment().getDeptName() : "");
+                    approverData.put("positionName", line.getApprover().getPosition() != null ? 
+                        line.getApprover().getPosition().getPositionName() : "");
+                    lineData.put("approver", approverData);
+                    lineData.put("orderSeq", line.getOrderSeq());
+                    approvalLinesData.add(lineData);
+                }
+                model.addAttribute("approvalLinesJson", approvalLinesData);
+                
+                // 참조자 데이터를 간단한 맵으로 변환
+                List<java.util.Map<String, Object>> referencesData = new ArrayList<>();
+                for (ApprovalReference ref : document.getReferences()) {
+                    java.util.Map<String, Object> refData = new java.util.HashMap<>();
+                    java.util.Map<String, Object> userData = new java.util.HashMap<>();
+                    userData.put("userId", ref.getUser().getUserId());
+                    userData.put("name", ref.getUser().getName());
+                    userData.put("deptName", ref.getUser().getDepartment() != null ? 
+                        ref.getUser().getDepartment().getDeptName() : "");
+                    userData.put("positionName", ref.getUser().getPosition() != null ? 
+                        ref.getUser().getPosition().getPositionName() : "");
+                    refData.put("user", userData);
+                    referencesData.add(refData);
+                }
+                model.addAttribute("referencesJson", referencesData);
+                
+                // 문서 타입별 관련 데이터 로드
+                if (document.getDocType() == DocumentType.LEAVE_REQUEST) {
+                    // TODO: 휴가신청서 데이터 로드
+                    // LeaveRequest leaveRequest = leaveRequestRepository.findByDocument(document);
+                    // model.addAttribute("leaveRequest", leaveRequest);
+                }
             } catch (Exception e) {
                 log.error("Failed to load document for edit: {}", id, e);
                 return "redirect:/approval";
@@ -182,11 +221,17 @@ public class ApprovalController {
                             .build());
                 }
                 approvalService.setApprovalLine(document.getDocId(), lines);
+            } else {
+                // 결재선이 비어있으면 기존 결재선 제거
+                approvalService.clearApprovalLine(document.getDocId());
             }
             
             // 참조자 설정
             if (referenceIds != null && !referenceIds.isEmpty()) {
                 approvalService.setReferences(document.getDocId(), referenceIds);
+            } else {
+                // 참조자가 비어있으면 기존 참조자 제거
+                approvalService.setReferences(document.getDocId(), new ArrayList<>());
             }
             
             // 첨부파일 처리 (추후 구현)

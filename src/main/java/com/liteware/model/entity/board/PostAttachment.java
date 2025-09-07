@@ -21,7 +21,7 @@ public class PostAttachment extends BaseEntity {
     @Column(name = "attachment_id")
     private Long attachmentId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
     

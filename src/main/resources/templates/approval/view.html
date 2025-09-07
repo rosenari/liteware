@@ -305,9 +305,9 @@
                         <button class="btn btn-success btn-block mb-2" onclick="submitDocument()">
                             <i class="fas fa-paper-plane"></i> 상신
                         </button>
-                        <button class="btn btn-info btn-block mb-2" onclick="editDocument()">
+                        <a th:href="@{/approval/draft(id=${document.docId})}" class="btn btn-info btn-block mb-2">
                             <i class="fas fa-edit"></i> 수정
-                        </button>
+                        </a>
                     </div>
                     
                     <a th:href="@{/approval}" class="btn btn-secondary btn-block">

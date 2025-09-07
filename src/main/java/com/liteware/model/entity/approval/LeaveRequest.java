@@ -51,6 +51,8 @@ public class LeaveRequest {
     
     private String emergencyContact; // 비상 연락처
     
+    private String substitute;      // 대체 근무자
+    
     private String handoverTo;      // 업무 인수인계자
     
     @Column(columnDefinition = "TEXT")
