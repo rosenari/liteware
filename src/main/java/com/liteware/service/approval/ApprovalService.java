@@ -416,7 +416,7 @@ public class ApprovalService {
         
         // 사용자와 관련된 최근 문서 조회 (기안자 또는 결재자)
         Pageable pageable = PageRequest.of(0, limit, Sort.by(Sort.Direction.DESC, "createdAt"));
-        return documentRepository.findRecentDocumentsByUser(user, pageable);
+        return documentRepository.findRecentDocumentsByUserWithStatus(user, DocumentStatus.PENDING, pageable);
     }
     
     public ApprovalDocument updateDocument(Long docId, ApprovalDocumentDto dto) {

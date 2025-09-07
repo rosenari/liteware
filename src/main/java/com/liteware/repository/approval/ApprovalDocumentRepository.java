@@ -66,12 +66,18 @@ public interface ApprovalDocumentRepository extends JpaRepository<ApprovalDocume
     
     @Query("SELECT d FROM ApprovalDocument d WHERE d.docId = :docId")
     Optional<ApprovalDocument> findByIdWithApprovalLines(@Param("docId") Long docId);
+
+    @Query("SELECT DISTINCT d FROM ApprovalDocument d LEFT JOIN d.approvalLines l " +
+            "WHERE (d.drafter = :user OR l.approver = :user)" +
+            "AND d.isDeleted = false " +
+            "ORDER BY d.createdAt DESC")
+    List<ApprovalDocument> findRecentDocumentsByUser(@Param("user") User user, Pageable pageable);
     
     @Query("SELECT DISTINCT d FROM ApprovalDocument d LEFT JOIN d.approvalLines l " +
-           "WHERE (d.drafter = :user OR l.approver = :user) " +
+           "WHERE (d.drafter = :user OR l.approver = :user) AND d.status = :status " +
            "AND d.isDeleted = false " +
            "ORDER BY d.createdAt DESC")
-    List<ApprovalDocument> findRecentDocumentsByUser(@Param("user") User user, Pageable pageable);
+    List<ApprovalDocument> findRecentDocumentsByUserWithStatus(@Param("user") User user, @Param("status") DocumentStatus status, Pageable pageable);
     
     /**
      * 특정 상태의 문서 수 조회

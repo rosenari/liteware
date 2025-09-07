@@ -199,7 +199,7 @@
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-file-signature mr-1"></i>
-                        최근 결재 문서
+                        최근 결재 대기 문서
                     </h3>
                     <div class="card-tools">
                         <a href="/approval" class="btn btn-tool btn-sm">
@@ -235,7 +235,7 @@
                                     <td class="text-xs" th:text="${#temporals.format(doc.createdAt, 'MM.dd')}">작성일</td>
                                 </tr>
                                 <tr th:if="${recentDocuments == null or recentDocuments.empty}">
-                                    <td colspan="4" class="text-center text-muted py-3">최근 결재 문서가 없습니다.</td>
+                                    <td colspan="4" class="text-center text-muted py-3">최근 결재 대기 문서가 없습니다.</td>
                                 </tr>
                             </tbody>
                         </table>
