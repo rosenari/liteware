@@ -13,6 +13,9 @@
         .approval-line-item.completed { background-color: #d4edda; }
         .approval-line-item.current { background-color: #fff3cd; }
         .approval-line-item.pending { background-color: #f8f9fa; }
+        .user-item:hover { background-color: #f8f9fa; }
+        .dept-item { cursor: pointer; padding: 5px; border-radius: 3px; }
+        .dept-item:hover { background-color: #e9ecef; }
     </style>
 </head>
 <body>
@@ -38,6 +41,9 @@
     <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
+    
+    <!-- 문서 ID를 저장하는 hidden input -->
+    <input type="hidden" id="docId" th:value="${document?.docId}" />
     
     <div class="row">
         <!-- 좌측: 문서 내용 -->
@@ -73,11 +79,11 @@
                                 <th style="background-color: #f8f9fa;">기안자</th>
                                 <td th:text="${document?.drafter?.name}">홍길동</td>
                                 <th style="background-color: #f8f9fa;">기안부서</th>
-                                <td th:text="${document?.drafter?.department?.name}">개발팀</td>
+                                <td th:text="${document?.drafter?.department?.deptName}">개발팀</td>
                             </tr>
                             <tr>
                                 <th style="background-color: #f8f9fa;">기안일</th>
-                                <td th:text="${#temporals.format(document?.draftedAt, 'yyyy.MM.dd HH:mm')}">2025.01.05 14:30</td>
+                                <td th:text="${document?.draftedAt != null ? #temporals.format(document.draftedAt, 'yyyy.MM.dd HH:mm') : '미설정'}">2025.01.05 14:30</td>
                                 <th style="background-color: #f8f9fa;">긴급도</th>
                                 <td>
                                     <span class="badge"
@@ -88,10 +94,11 @@
                             </tr>
                             
                             <!-- 휴가신청서인 경우 추가 정보 -->
-                            <tr th:if="${document?.docType?.name() == 'VACATION'}">
+                            <tr th:if="${document?.docType?.name() == 'LEAVE_REQUEST'}">
                                 <th style="background-color: #f8f9fa;">휴가기간</th>
                                 <td colspan="3">
-                                    2025.01.10 ~ 2025.01.12 (3일간)
+                                    <span th:if="${document?.metadata != null}" th:text="${document.metadata.get('startDate')} + ' ~ ' + ${document.metadata.get('endDate')}">2025.01.10 ~ 2025.01.12</span>
+                                    <span th:unless="${document?.metadata != null}">미지정</span>
                                 </td>
                             </tr>
                         </tbody>
@@ -135,7 +142,7 @@
                                 <div class="timeline-item">
                                     <span class="time">
                                         <i class="fas fa-clock"></i>
-                                        <span th:text="${#temporals.format(line.processedAt, 'MM.dd HH:mm')}">01.05 15:30</span>
+                                        <span th:text="${#temporals.format(line.approvedAt, 'MM.dd HH:mm')}">01.05 15:30</span>
                                     </span>
                                     <h3 class="timeline-header">
                                         <span th:text="${line.approver?.name}">김부장</span>
@@ -193,8 +200,17 @@
                     </h3>
                 </div>
                 <div class="card-body">
+                    <!-- 기안 문서인 경우 추가 버튼 표시 -->
+                    <div th:if="${document?.status?.name() == 'DRAFT' and document?.drafter?.userId == #authentication?.principal?.userId}" class="mb-3">
+                        <button type="button" class="btn btn-sm btn-primary" onclick="openApproverModal()">
+                            <i class="fas fa-plus"></i> 결재자 추가
+                        </button>
+                    </div>
+                    
+                    <!-- 결재선 목록 -->
                     <div th:each="line, stat : ${document?.approvalLines}" 
                          class="approval-line-item"
+                         th:data-user-id="${line.approver?.userId}"
                          th:classappend="${line.status?.name() == 'APPROVED' ? 'completed' : 
                                          (line.status?.name() == 'PENDING' and stat.index == currentApprovalIndex ? 'current' : 
                                          (line.status?.name() == 'PENDING' ? 'pending' : ''))}">
@@ -202,19 +218,35 @@
                             <div>
                                 <strong th:text="${line.approver?.name}">김부장</strong>
                                 <br>
-                                <small class="text-muted" th:text="${line.approver?.position?.name}">부장</small>
+                                <small class="text-muted">
+                                    <span th:text="${line.approver?.department?.deptName}">개발팀</span> /
+                                    <span th:text="${line.approver?.position?.positionName}">부장</span>
+                                </small>
                             </div>
                             <div class="text-right">
+                                <!-- 기안 문서일 때 삭제 버튼 표시 -->
+                                <button th:if="${document?.status?.name() == 'DRAFT' and document?.drafter?.userId == #authentication?.principal?.userId}" 
+                                        type="button" 
+                                        class="btn btn-sm btn-danger mr-2" 
+                                        th:onclick="'removeApprovalLine(' + ${stat.index} + ')'">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                                 <span class="badge"
                                       th:classappend="${line.status?.name() == 'APPROVED' ? 'badge-success' : 
                                                       (line.status?.name() == 'REJECTED' ? 'badge-danger' : 
                                                       (line.status?.name() == 'PENDING' ? 'badge-warning' : 'badge-secondary'))}"
                                       th:text="${line.status?.description}">대기</span>
                                 <br>
-                                <small th:if="${line.processedAt != null}" 
-                                       th:text="${#temporals.format(line.processedAt, 'MM.dd HH:mm')}">01.05 15:30</small>
+                                <small th:if="${line.approvedAt != null}"
+                                       th:text="${#temporals.format(line.approvedAt, 'MM.dd HH:mm')}">01.05 15:30</small>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- 결재선이 없는 경우 -->
+                    <div th:if="${document?.approvalLines == null or document.approvalLines.isEmpty()}" class="text-center text-muted py-3">
+                        <i class="fas fa-user-slash mb-2"></i><br>
+                        결재선이 설정되지 않았습니다.
                     </div>
                 </div>
             </div>
@@ -227,8 +259,16 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div th:each="ref : ${document.references}">
-                        <span class="badge badge-secondary" th:text="${ref.name}">이과장</span>
+                    <div th:each="ref : ${document.references}" class="mb-2">
+                        <span class="badge badge-info">
+                            <i class="fas fa-user"></i>
+                            <span th:text="${ref.user?.name}">이과장</span>
+                            <small th:text="'(' + ${ref.user?.department?.deptName} + ')'" class="ml-1">(개발팀)</small>
+                        </span>
+                        <span th:if="${ref.isRead}" class="ml-2 text-muted">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <small>열람</small>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -242,13 +282,16 @@
                 </div>
                 <div class="card-body p-0">
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <small class="text-muted">2025.01.05 14:30</small><br>
-                            문서 기안 - 홍길동
+                        <li class="list-group-item" th:if="${document?.draftedAt != null}">
+                            <small class="text-muted" th:text="${#temporals.format(document.draftedAt, 'yyyy.MM.dd HH:mm')}">2025.01.05 14:30</small><br>
+                            문서 기안 - <span th:text="${document?.drafter?.name}">홍길동</span>
                         </li>
-                        <li class="list-group-item" th:each="history : ${document?.histories}">
-                            <small class="text-muted" th:text="${#temporals.format(history.createdAt, 'yyyy.MM.dd HH:mm')}">2025.01.05 15:30</small><br>
-                            <span th:text="${history.action}">김부장 승인</span>
+                        <!-- 결재 이력은 approvalLines에서 가져옴 -->
+                        <li class="list-group-item" th:each="line : ${document?.approvalLines}" 
+                            th:if="${line.approvedAt != null}">
+                            <small class="text-muted" th:text="${#temporals.format(line.approvedAt, 'yyyy.MM.dd HH:mm')}">2025.01.05 15:30</small><br>
+                            <span th:text="${line.approver?.name}">김부장</span> 
+                            <span th:text="${line.status?.description}">승인</span>
                         </li>
                     </ul>
                 </div>
@@ -257,12 +300,16 @@
             <!-- 액션 버튼 -->
             <div class="card">
                 <div class="card-body">
-                    <button class="btn btn-primary btn-block" onclick="printDocument()">
-                        <i class="fas fa-print"></i> 인쇄
-                    </button>
-                    <button class="btn btn-info btn-block" onclick="downloadPDF()">
-                        <i class="fas fa-file-pdf"></i> PDF 다운로드
-                    </button>
+                    <!-- 기안 문서인 경우 버튼들 추가 -->
+                    <div th:if="${document?.status?.name() == 'DRAFT' and document?.drafter?.userId == #authentication?.principal?.userId}">
+                        <button class="btn btn-success btn-block mb-2" onclick="submitDocument()">
+                            <i class="fas fa-paper-plane"></i> 상신
+                        </button>
+                        <button class="btn btn-info btn-block mb-2" onclick="editDocument()">
+                            <i class="fas fa-edit"></i> 수정
+                        </button>
+                    </div>
+                    
                     <a th:href="@{/approval}" class="btn btn-secondary btn-block">
                         <i class="fas fa-list"></i> 목록으로
                     </a>
@@ -273,10 +320,44 @@
     
         </div>
     </section>
+    
+    <!-- 조직도 모달 (결재선 편집용) -->
+    <div class="modal fade" id="orgChartModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">결재자 선택</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>조직도</h6>
+                        <div id="orgTree" style="max-height: 400px; overflow-y: auto;">
+                            <!-- 조직도 트리 (JavaScript로 생성) -->
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>사용자 목록</h6>
+                        <div id="userList" style="max-height: 400px; overflow-y: auto;">
+                            <!-- 사용자 목록 (JavaScript로 생성) -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                <button type="button" class="btn btn-primary" onclick="addSelectedApprover()">추가</button>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 <th:block layout:fragment="scripts">
-<script>
+<script defer>
 function processApproval(status) {
     if (status === 'REJECTED') {
         if (!confirm('정말 반려하시겠습니까?')) {
@@ -292,7 +373,8 @@ function processApproval(status) {
     var formData = new FormData(form);
     formData.append('status', status);
     
-    fetch('/approval/process/' + [[${document?.docId}]], {
+    const docId = document.getElementById('docId').value;
+    fetch('/approval/process/' + docId, {
         method: 'POST',
         body: formData
     })
@@ -315,8 +397,269 @@ function printDocument() {
 }
 
 function downloadPDF() {
-    window.location.href = '/approval/download/' + [[${document?.docId}]];
+    const docId = document.getElementById('docId').value;
+    window.location.href = '/approval/download/' + docId;
 }
+
+// 결재선 관리
+let currentApprovalLines = [];
+
+function removeApprovalLine(index) {
+    if (!confirm('정말 이 결재자를 삭제하시겠습니까?')) {
+        return;
+    }
+    
+    const docId = document.getElementById('docId').value;
+    
+    // 현재 페이지에 표시된 결재선에서 userId 추출
+    const approverIds = [];
+    $('.approval-line-item').each(function(i) {
+        if (i !== index) {
+            const userId = $(this).data('user-id');
+            if (userId) {
+                approverIds.push(userId);
+            }
+        }
+    });
+    
+    // 서버에 업데이트
+    $.ajax({
+        url: `/approval/${docId}/updateApprovalLine`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ approverIds: approverIds }),
+        success: function(response) {
+            alert('결재자가 삭제되었습니다.');
+            location.reload();
+        },
+        error: function(xhr) {
+            alert('결재선 수정 중 오류가 발생했습니다.');
+        }
+    });
+}
+
+function openApproverModal() {
+    // 현재 결재선 가져오기
+    currentApprovalLines = [];
+    
+    // 현재 페이지에 표시된 결재선에서 userId 추출
+    $('.approval-line-item').each(function() {
+        const userId = $(this).data('user-id');
+        if (userId) {
+            currentApprovalLines.push(userId);
+        }
+    });
+    
+    // 모달 열기
+    $('#orgChartModal').modal('show');
+}
+
+function editDocument() {
+    // 수정 페이지로 이동
+    const docId = document.getElementById('docId').value;
+    window.location.href = `/approval/draft?id=${docId}`;
+}
+
+function submitDocument() {
+    // 상신 처리
+    const docId = document.getElementById('docId').value;
+    
+    // 결재선 확인 - DOM에서 직접 확인
+    const hasApprovalLines = $('.approval-line-item:not(.no-approver)').length > 0;
+    if (!hasApprovalLines) {
+        alert('결재선을 설정해주세요.');
+        return;
+    }
+    
+    if (!confirm('문서를 상신하시겠습니까?\n상신 후에는 수정이 불가능합니다.')) {
+        return;
+    }
+    
+    $.ajax({
+        url: `/approval/${docId}/submit`,
+        type: 'POST',
+        success: function(response, status, xhr) {
+            alert('문서가 상신되었습니다.');
+            // 결재 대기 탭으로 이동
+            window.location.href = '/approval?type=pending';
+        },
+        error: function(xhr) {
+            if (xhr.status === 302 || xhr.status === 0) {
+                // 리다이렉트인 경우
+                alert('문서가 상신되었습니다.');
+                window.location.href = '/approval?type=pending';
+            } else {
+                alert('상신 처리 중 오류가 발생했습니다.');
+            }
+        }
+    });
+}
+
+// 조직도 모달 관련 함수들
+let selectedApprover = null;
+
+function loadOrgChart() {
+    // 조직도와 사용자 목록 로드
+    $.ajax({
+        url: '/api/organization/departments',
+        type: 'GET',
+        success: function(departments) {
+            renderOrgTree(departments);
+        },
+        error: function() {
+            $('#orgTree').html('<p class="text-muted">부서 정보를 불러올 수 없습니다.</p>');
+        }
+    });
+    
+    $.ajax({
+        url: '/api/users',
+        type: 'GET',
+        success: function(users) {
+            renderUserList(users);
+        },
+        error: function() {
+            $('#userList').html('<p class="text-muted">사용자 정보를 불러올 수 없습니다.</p>');
+        }
+    });
+}
+
+function renderOrgTree(departments) {
+    if (!departments || departments.length === 0) {
+        $('#orgTree').html('<p class="text-muted">부서 정보가 없습니다.</p>');
+        return;
+    }
+    
+    let treeHtml = '<ul class="list-unstyled">';
+    const rootDepartments = departments.filter(dept => !dept.parentDepartment);
+    
+    rootDepartments.forEach(dept => {
+        treeHtml += `<li class="mb-2">
+            <i class="fas fa-folder text-primary"></i>
+            <a href="#" onclick="loadDepartmentUsers(${dept.deptId}); return false;" class="ml-1">
+                ${dept.deptName}
+            </a>
+        </li>`;
+        
+        const subDepts = departments.filter(d => d.parentDepartment && d.parentDepartment.deptId === dept.deptId);
+        if (subDepts.length > 0) {
+            treeHtml += '<ul class="list-unstyled ml-3">';
+            subDepts.forEach(subDept => {
+                treeHtml += `<li class="mb-1">
+                    <i class="fas fa-folder-open text-info"></i>
+                    <a href="#" onclick="loadDepartmentUsers(${subDept.deptId}); return false;" class="ml-1">
+                        ${subDept.deptName}
+                    </a>
+                </li>`;
+            });
+            treeHtml += '</ul>';
+        }
+    });
+    
+    treeHtml += '</ul>';
+    $('#orgTree').html(treeHtml);
+}
+
+function renderUserList(users) {
+    if (!users || users.length === 0) {
+        $('#userList').html('<p class="text-muted">사용자 정보가 없습니다.</p>');
+        return;
+    }
+    
+    let listHtml = '';
+    users.forEach(user => {
+        const deptName = user.department ? user.department.deptName : '미지정';
+        const positionName = user.position ? user.position.positionName : '미지정';
+        
+        listHtml += `
+            <div class="user-item" style="cursor: pointer;" 
+                 onclick="selectApprover(${user.userId}, '${user.name}', '${positionName}', '${deptName}')">
+                <div class="d-flex justify-content-between align-items-center p-2 border-bottom">
+                    <div>
+                        <strong>${user.name}</strong>
+                        <small class="text-muted">(${positionName})</small>
+                        <br>
+                        <small class="text-muted">${deptName}</small>
+                    </div>
+                    <input type="radio" name="approverRadio" value="${user.userId}">
+                </div>
+            </div>`;
+    });
+    
+    $('#userList').html(listHtml);
+}
+
+function loadDepartmentUsers(deptId) {
+    $.ajax({
+        url: `/api/organization/departments/${deptId}/users`,
+        type: 'GET',
+        success: function(users) {
+            renderUserList(users);
+        },
+        error: function() {
+            $('#userList').html('<p class="text-muted">사용자 정보를 불러올 수 없습니다.</p>');
+        }
+    });
+}
+
+function selectApprover(userId, name, position, department) {
+    selectedApprover = {
+        userId: userId,
+        name: name,
+        position: position,
+        department: department
+    };
+    $(`input[name="approverRadio"][value="${userId}"]`).prop('checked', true);
+}
+
+function addSelectedApprover() {
+    if (!selectedApprover) {
+        alert('결재자를 선택해주세요.');
+        return;
+    }
+    
+    // 중복 체크
+    if (currentApprovalLines.includes(selectedApprover.userId)) {
+        alert('이미 추가된 결재자입니다.');
+        return;
+    }
+    
+    const docId = document.getElementById('docId').value;
+    
+    // 현재 결재선에 새 결재자 추가 - Number로 변환
+    const approverIds = [...currentApprovalLines, Number(selectedApprover.userId)];
+    
+    console.log('Sending approverIds:', approverIds); // 디버깅용
+    
+    // 서버에 업데이트
+    $.ajax({
+        url: `/approval/${docId}/updateApprovalLine`,
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ approverIds: approverIds }),
+        success: function(response) {
+            if (response.success) {
+                alert('결재자가 추가되었습니다.');
+                $('#orgChartModal').modal('hide');
+                location.reload();
+            } else {
+                alert(response.message || '결재선 수정 중 오류가 발생했습니다.');
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('Error:', error);
+            alert('결재선 수정 중 오류가 발생했습니다: ' + error);
+        }
+    });
+    
+    selectedApprover = null;
+}
+
+// 모달이 열릴 때 조직도 로드
+$(document).ready(function() {
+    $('#orgChartModal').on('show.bs.modal', function() {
+        loadOrgChart();
+    });
+});
 </script>
 </th:block>
 </body>

@@ -48,13 +48,13 @@
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
                     <i class="far fa-bell"></i>
-                    <span class="badge badge-warning navbar-badge" th:text="${pendingApprovals != null ? pendingApprovals : 0}">0</span>
+                    <span class="badge badge-warning navbar-badge" th:text="${pendingApprovalCount != null ? pendingApprovalCount : 0}">0</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <span class="dropdown-item dropdown-header" th:text="${pendingApprovals != null ? pendingApprovals + '개의 알림' : '알림이 없습니다'}">알림이 없습니다</span>
+                    <span class="dropdown-item dropdown-header" th:text="${pendingApprovalCount != null && pendingApprovalCount > 0 ? pendingApprovalCount + '개의 알림' : '알림이 없습니다'}">알림이 없습니다</span>
                     <div class="dropdown-divider"></div>
                     <a href="/approval?type=pending" class="dropdown-item">
-                        <i class="fas fa-file-signature mr-2"></i> 결재 대기 <span th:text="${pendingApprovals != null ? pendingApprovals + '건' : '0건'}">0건</span>
+                        <i class="fas fa-file-signature mr-2"></i> 결재 대기 <span th:text="${pendingApprovalCount != null ? pendingApprovalCount + '건' : '0건'}">0건</span>
                         <span class="float-right text-muted text-sm">실시간</span>
                     </a>
                     <div class="dropdown-divider"></div>
@@ -117,7 +117,7 @@
                             <p>
                                 전자결재
                                 <i class="fas fa-angle-left right"></i>
-                                <span class="badge badge-info right">4</span>
+                                <span class="badge badge-info right" th:text="${pendingApprovalCount}">0</span>
                             </p>
                         </a>
                         <ul class="nav nav-treeview">

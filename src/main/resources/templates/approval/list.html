@@ -37,7 +37,7 @@
                     <a class="nav-link" th:classappend="${type == 'pending' ? 'active' : ''}" 
                        href="/approval?type=pending">
                         <i class="fas fa-clock"></i> 결재 대기
-                        <span class="badge badge-danger ml-1">4</span>
+                        <span class="badge badge-danger ml-1" th:text="${pendingApprovalCount}">0</span>
                     </a>
                 </li>
                 <li class="nav-item">

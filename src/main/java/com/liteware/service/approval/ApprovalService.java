@@ -94,6 +94,7 @@ public class ApprovalService {
         return documentRepository.save(document);
     }
     
+    @Transactional
     public List<ApprovalLine> setApprovalLine(Long docId, List<ApprovalLineDto> lineDtos) {
         ApprovalDocument document = documentRepository.findById(docId)
                 .orElseThrow(() -> new RuntimeException("문서를 찾을 수 없습니다"));
@@ -102,6 +103,7 @@ public class ApprovalService {
             throw new RuntimeException("임시저장 상태의 문서만 결재선을 설정할 수 있습니다");
         }
         
+        // 기존 결재선 삭제
         approvalLineRepository.deleteByDocument(document);
         document.getApprovalLines().clear();
         
@@ -123,7 +125,15 @@ public class ApprovalService {
             document.addApprovalLine(line);
         }
         
-        return approvalLineRepository.saveAll(lines);
+        // 결재선 저장
+        List<ApprovalLine> savedLines = approvalLineRepository.saveAll(lines);
+        
+        // 문서 업데이트
+        documentRepository.save(document);
+        
+        log.info("Document {} approval lines updated: {} lines", docId, savedLines.size());
+        
+        return savedLines;
     }
     
     public ApprovalDocument submitDocument(Long docId) {
@@ -278,8 +288,21 @@ public class ApprovalService {
     
     @Transactional(readOnly = true)
     public ApprovalDocument getDocument(Long docId) {
-        return documentRepository.findByIdWithApprovalLines(docId)
+        ApprovalDocument document = documentRepository.findByIdWithApprovalLines(docId)
                 .orElseThrow(() -> new RuntimeException("문서를 찾을 수 없습니다"));
+        
+        // 첨부파일을 lazy하게 로드 (필요시 별도 쿼리로)
+        // Hibernate.initialize(document.getAttachments());
+        
+        return document;
+    }
+    
+    public ApprovalDocument updateDocument(ApprovalDocument document) {
+        if (document.getStatus() != DocumentStatus.DRAFT) {
+            throw new RuntimeException("기안 상태의 문서만 수정할 수 있습니다");
+        }
+        
+        return documentRepository.save(document);
     }
     
     @Transactional(readOnly = true)
@@ -418,5 +441,64 @@ public class ApprovalService {
     @Transactional(readOnly = true)
     public long getTotalApprovedCount() {
         return documentRepository.countByStatus(DocumentStatus.APPROVED);
+    }
+    
+    /**
+     * 결재선 제거 (기안 문서만 가능)
+     */
+    @Transactional
+    public void clearApprovalLine(Long docId) {
+        ApprovalDocument document = documentRepository.findById(docId)
+                .orElseThrow(() -> new RuntimeException("문서를 찾을 수 없습니다"));
+        
+        if (document.getStatus() != DocumentStatus.DRAFT) {
+            throw new RuntimeException("기안 상태의 문서만 결재선을 제거할 수 있습니다");
+        }
+        
+        // 기존 결재선 제거
+        approvalLineRepository.deleteByDocument(document);
+        
+        // 문서의 결재선 리스트 초기화
+        document.getApprovalLines().clear();
+        document.setCurrentApprover(null);
+        
+        documentRepository.save(document);
+        
+        log.info("Approval line cleared for document: {}", document.getDocNumber());
+    }
+    
+    public void setReferences(Long docId, List<Long> referenceUserIds) {
+        ApprovalDocument document = documentRepository.findById(docId)
+                .orElseThrow(() -> new RuntimeException("문서를 찾을 수 없습니다"));
+        
+        // 기존 참조자 제거
+        document.clearReferences();
+        
+        // 새 참조자 추가
+        if (referenceUserIds != null && !referenceUserIds.isEmpty()) {
+            for (int i = 0; i < referenceUserIds.size(); i++) {
+                User user = userRepository.findById(referenceUserIds.get(i))
+                        .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+                
+                ApprovalReference reference = ApprovalReference.builder()
+                        .document(document)
+                        .user(user)
+                        .sortOrder(i + 1)
+                        .isRead(false)
+                        .build();
+                
+                document.addReference(reference);
+            }
+        }
+        
+        documentRepository.save(document);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<ApprovalDocument> getReferencedDocuments(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
+        
+        return documentRepository.findDocumentsByReferenceUser(user);
     }
 }

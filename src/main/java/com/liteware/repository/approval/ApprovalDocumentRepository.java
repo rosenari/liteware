@@ -64,8 +64,7 @@ public interface ApprovalDocumentRepository extends JpaRepository<ApprovalDocume
            "AND d.status = 'PENDING'")
     Long countPendingDocuments(@Param("approver") User approver);
     
-    @Query("SELECT d FROM ApprovalDocument d LEFT JOIN FETCH d.approvalLines " +
-           "WHERE d.docId = :docId")
+    @Query("SELECT d FROM ApprovalDocument d WHERE d.docId = :docId")
     Optional<ApprovalDocument> findByIdWithApprovalLines(@Param("docId") Long docId);
     
     @Query("SELECT DISTINCT d FROM ApprovalDocument d LEFT JOIN d.approvalLines l " +
@@ -78,4 +77,12 @@ public interface ApprovalDocumentRepository extends JpaRepository<ApprovalDocume
      * 특정 상태의 문서 수 조회
      */
     long countByStatus(DocumentStatus status);
+    
+    /**
+     * 참조자로 지정된 문서 조회
+     */
+    @Query("SELECT DISTINCT d FROM ApprovalDocument d JOIN d.references r " +
+           "WHERE r.user = :user AND d.isDeleted = false " +
+           "ORDER BY d.createdAt DESC")
+    List<ApprovalDocument> findDocumentsByReferenceUser(@Param("user") User user);
 }

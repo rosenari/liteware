@@ -367,4 +367,106 @@ class ApprovalServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).getDrafter()).isEqualTo(drafter);
     }
+    
+    @Test
+    @DisplayName("결재선을 제거할 수 있어야 한다")
+    void clearApprovalLine() {
+        ApprovalLine line1 = ApprovalLine.builder()
+                .lineId(1L)
+                .document(document)
+                .approver(approver1)
+                .build();
+        
+        document.getApprovalLines().add(line1);
+        
+        when(documentRepository.findById(1L)).thenReturn(Optional.of(document));
+        doNothing().when(approvalLineRepository).deleteByDocument(document);
+        when(documentRepository.save(any(ApprovalDocument.class))).thenReturn(document);
+        
+        approvalService.clearApprovalLine(1L);
+        
+        assertThat(document.getApprovalLines()).isEmpty();
+        verify(approvalLineRepository).deleteByDocument(document);
+        verify(documentRepository).save(document);
+    }
+    
+    @Test
+    @DisplayName("참조자를 설정할 수 있어야 한다")
+    void setReferences() {
+        List<Long> referenceUserIds = Arrays.asList(2L, 3L);
+        
+        when(documentRepository.findById(1L)).thenReturn(Optional.of(document));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(approver1));
+        when(userRepository.findById(3L)).thenReturn(Optional.of(approver2));
+        when(documentRepository.save(any(ApprovalDocument.class))).thenReturn(document);
+        
+        approvalService.setReferences(1L, referenceUserIds);
+        
+        assertThat(document.getReferences()).hasSize(2);
+        verify(documentRepository).save(document);
+    }
+    
+    @Test
+    @DisplayName("참조된 문서를 조회할 수 있어야 한다")
+    void getReferencedDocuments() {
+        List<ApprovalDocument> documents = Arrays.asList(document);
+        
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(documentRepository.findDocumentsByReferenceUser(user)).thenReturn(documents);
+        
+        List<ApprovalDocument> result = approvalService.getReferencedDocuments(1L);
+        
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)).isEqualTo(document);
+    }
+    
+    @Test
+    @DisplayName("문서를 수정할 수 있어야 한다")
+    void updateDocument() {
+        ApprovalDocumentDto updateDto = ApprovalDocumentDto.builder()
+                .title("수정된 제목")
+                .content("수정된 내용")
+                .urgency(UrgencyType.URGENT)
+                .build();
+        
+        when(documentRepository.findById(1L)).thenReturn(Optional.of(document));
+        when(documentRepository.save(any(ApprovalDocument.class))).thenReturn(document);
+        
+        ApprovalDocument updated = approvalService.updateDocument(1L, updateDto);
+        
+        assertThat(updated.getTitle()).isEqualTo("수정된 제목");
+        assertThat(updated.getContent()).isEqualTo("수정된 내용");
+        assertThat(updated.getUrgency()).isEqualTo(UrgencyType.URGENT);
+        
+        verify(documentRepository).save(document);
+    }
+    
+    @Test
+    @DisplayName("결재를 위임할 수 있어야 한다")
+    void delegateApproval() {
+        LocalDateTime startDate = LocalDateTime.now();
+        LocalDateTime endDate = startDate.plusDays(7);
+        
+        ApprovalLine line1 = ApprovalLine.builder()
+                .lineId(1L)
+                .document(document)
+                .approver(approver1)
+                .status(ApprovalStatus.PENDING)
+                .build();
+        
+        List<ApprovalLine> pendingLines = Arrays.asList(line1);
+        
+        when(userRepository.findById(1L)).thenReturn(Optional.of(approver1));
+        when(userRepository.findById(2L)).thenReturn(Optional.of(approver2));
+        when(approvalLineRepository.findByApproverAndStatus(approver1, ApprovalStatus.PENDING))
+                .thenReturn(pendingLines);
+        when(approvalLineRepository.saveAll(anyList())).thenReturn(pendingLines);
+        
+        approvalService.delegateApproval(1L, 2L, startDate, endDate);
+        
+        assertThat(line1.getDelegatedTo()).isEqualTo(approver2);
+        assertThat(line1.getDelegatedAt()).isNotNull();
+        
+        verify(approvalLineRepository).saveAll(pendingLines);
+    }
 }

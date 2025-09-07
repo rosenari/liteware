@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -54,14 +55,15 @@ public class ApprovalDocument extends BaseEntity {
     @Builder.Default
     private DocumentStatus status = DocumentStatus.DRAFT;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "drafter_id", nullable = false)
     private User drafter;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "current_approver_id")
     private User currentApprover;
-    
+
+    @CreationTimestamp
     @Column(name = "drafted_at")
     private LocalDateTime draftedAt;
     
@@ -73,23 +75,28 @@ public class ApprovalDocument extends BaseEntity {
     @Builder.Default
     private UrgencyType urgency = UrgencyType.NORMAL;
     
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true,  fetch = FetchType.EAGER)
     @OrderBy("orderSeq ASC")
     @Builder.Default
     private List<ApprovalLine> approvalLines = new ArrayList<>();
     
-    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @Builder.Default
     private List<ApprovalAttachment> attachments = new ArrayList<>();
     
-    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private LeaveRequest leaveRequest;
     
-    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private OvertimeRequest overtimeRequest;
     
-    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "document", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private ExpenseRequest expenseRequest;
+    
+    @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OrderBy("sortOrder ASC")
+    @Builder.Default
+    private List<ApprovalReference> references = new ArrayList<>();
     
     @Column(name = "is_deleted")
     @Builder.Default
@@ -120,5 +127,19 @@ public class ApprovalDocument extends BaseEntity {
     public void removeAttachment(ApprovalAttachment attachment) {
         attachments.remove(attachment);
         attachment.setDocument(null);
+    }
+    
+    public void addReference(ApprovalReference reference) {
+        references.add(reference);
+        reference.setDocument(this);
+    }
+    
+    public void removeReference(ApprovalReference reference) {
+        references.remove(reference);
+        reference.setDocument(null);
+    }
+    
+    public void clearReferences() {
+        references.clear();
     }
 }

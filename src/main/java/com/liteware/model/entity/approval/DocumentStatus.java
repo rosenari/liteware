@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum DocumentStatus {
-    DRAFT("임시저장"),
-    PENDING("진행중"),
+    DRAFT("기안"),
+    PENDING("결제대기"),
     APPROVED("승인"),
     REJECTED("반려"),
     CANCELLED("회수");

@@ -25,11 +25,11 @@ public class ApprovalLine extends BaseEntity {
     @Column(name = "line_id")
     private Long lineId;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "doc_id", nullable = false)
     private ApprovalDocument document;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "approver_id", nullable = false)
     private User approver;
     
@@ -55,7 +55,7 @@ public class ApprovalLine extends BaseEntity {
     @Builder.Default
     private Boolean isOptional = false;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "delegated_to")
     private User delegatedTo;
     

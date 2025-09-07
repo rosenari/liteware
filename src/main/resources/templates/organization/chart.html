@@ -286,41 +286,15 @@
                                 </tr>
                             </thead>
                             <tbody id="directoryTable">
-                                <tr>
-                                    <td>김철수</td>
-                                    <td>인사팀</td>
-                                    <td>팀장</td>
-                                    <td>kim@company.com</td>
-                                    <td>010-1234-5678</td>
-                                    <td>1234</td>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.name}">이름</td>
+                                    <td th:text="${user.department?.deptName}">부서</td>
+                                    <td th:text="${user.position?.positionName}">직급</td>
+                                    <td th:text="${user.email}">이메일</td>
+                                    <td th:text="${user.phone}">연락처</td>
+                                    <td>-</td>
                                     <td>
-                                        <button class="btn btn-sm btn-info" onclick="showUserDetail(1)">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>이영희</td>
-                                    <td>인사팀</td>
-                                    <td>과장</td>
-                                    <td>lee@company.com</td>
-                                    <td>010-2345-6789</td>
-                                    <td>1235</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" onclick="showUserDetail(2)">
-                                            <i class="fas fa-info-circle"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>박민수</td>
-                                    <td>총무팀</td>
-                                    <td>팀장</td>
-                                    <td>park@company.com</td>
-                                    <td>010-3456-7890</td>
-                                    <td>1236</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-info" onclick="showUserDetail(3)">
+                                        <button class="btn btn-sm btn-info" th:onclick="'showUserDetail(' + ${user.userId} + ')'">
                                             <i class="fas fa-info-circle"></i>
                                         </button>
                                     </td>

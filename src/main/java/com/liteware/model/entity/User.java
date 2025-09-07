@@ -75,14 +75,14 @@ public class User extends BaseEntity {
     @JoinColumn(name = "department_id")
     private Department department;
     
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "position_id")
     private Position position;
     
     @Column(name = "hire_date")
     private LocalDate hireDate;
     
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "user_roles",
         joinColumns = @JoinColumn(name = "user_id"),
