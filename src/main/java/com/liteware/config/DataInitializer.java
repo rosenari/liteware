@@ -28,7 +28,7 @@ import java.util.HashSet;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-@Profile({"docker", "dev", "test"})
+@Profile({"docker", "dev"})
 public class DataInitializer {
 
     @Bean

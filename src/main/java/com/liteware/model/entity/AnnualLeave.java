@@ -56,7 +56,7 @@ public class AnnualLeave extends BaseEntity {
         }
         
         if (hours > remainingHours) {
-            throw new IllegalArgumentException("남은 연차 시간이 부족합니다.");
+            throw new RuntimeException("연차가 부족합니다. 남은 시간: " + remainingHours + ", 요청 시간: " + hours);
         }
         
         this.usedHours += hours;

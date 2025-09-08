@@ -30,7 +30,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public List<User> getAllUsers() {
-        return userRepository.findAllWithFullInfo();
+        return userRepository.findAll();
     }
     
     /**
@@ -96,10 +96,11 @@ public class UserService {
         User user = getUserById(userId);
         
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new RuntimeException("현재 비밀번호가 일치하지 않습니다");
         }
         
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.setPasswordChangedAt(java.time.LocalDate.now());
         userRepository.save(user);
     }
     
@@ -123,10 +124,10 @@ public class UserService {
     @Transactional
     public User createUser(UserDto userDto) {
         // 중복 체크
-        if (userRepository.findByLoginId(userDto.getLoginId()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 사용자ID입니다: " + userDto.getLoginId());
+        if (userRepository.existsByLoginId(userDto.getLoginId())) {
+            throw new RuntimeException("이미 사용중인 로그인 ID입니다");
         }
-        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
+        if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new RuntimeException("이미 존재하는 이메일입니다: " + userDto.getEmail());
         }
         
@@ -162,7 +163,8 @@ public class UserService {
     @Transactional
     public void deleteUser(Long userId) {
         User user = getUserById(userId);
-        userRepository.delete(user);
+        user.setIsDeleted(true);
+        userRepository.save(user);
     }
     
     /**
@@ -171,11 +173,7 @@ public class UserService {
     @Transactional
     public void toggleUserStatus(Long userId) {
         User user = getUserById(userId);
-        if (user.getStatus() == com.liteware.model.entity.UserStatus.ACTIVE) {
-            user.setStatus(com.liteware.model.entity.UserStatus.INACTIVE);
-        } else {
-            user.setStatus(com.liteware.model.entity.UserStatus.ACTIVE);
-        }
+        user.setActive(!user.isActive());
         userRepository.save(user);
     }
     

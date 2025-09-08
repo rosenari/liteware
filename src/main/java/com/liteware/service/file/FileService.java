@@ -196,13 +196,15 @@ public class FileService {
             }
             
             String extension = getFileExtension(fileName);
-            if (!isAllowedExtension(extension)) {
-                throw new IllegalArgumentException("File extension not allowed: " + extension);
-            }
             
-            // 실행 파일 차단
+            // 실행 파일 차단 (먼저 체크)
             if (isExecutableFile(extension)) {
                 throw new IllegalArgumentException("Executable files are not allowed");
+            }
+            
+            // 확장자가 있는 경우만 검사 (확장자 없는 파일은 허용)
+            if (!extension.isEmpty() && !isAllowedExtension(extension)) {
+                throw new IllegalArgumentException("File extension not allowed: " + extension);
             }
         }
     }

@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "approval_documents",
@@ -105,7 +106,7 @@ public class ApprovalDocument extends BaseEntity {
     @PrePersist
     public void generateDocNumber() {
         if (this.docNumber == null) {
-            this.docNumber = "DOC-" + System.currentTimeMillis();
+            this.docNumber = "DOC-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 8);
         }
     }
     

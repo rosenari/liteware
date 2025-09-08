@@ -120,6 +120,14 @@ public class AuthService {
     }
     
     public LoginResponse login(LoginRequest request) {
+        // 먼저 사용자 존재 여부와 계정 상태 확인
+        User user = userRepository.findByLoginId(request.getLoginId()).orElse(null);
+        if (user != null) {
+            if (user.getStatus() == UserStatus.SUSPENDED || user.isAccountLocked()) {
+                throw new RuntimeException("계정이 잠겨있습니다. 관리자에게 문의하세요.");
+            }
+        }
+        
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -128,11 +136,9 @@ public class AuthService {
                     )
             );
             
-            User user = userRepository.findByLoginId(request.getLoginId())
-                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
-            
-            if (user.getStatus() == UserStatus.SUSPENDED || user.isAccountLocked()) {
-                throw new RuntimeException("계정이 잠겨있습니다. 관리자에게 문의하세요.");
+            if (user == null) {
+                user = userRepository.findByLoginId(request.getLoginId())
+                        .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다"));
             }
             
             user.resetLoginAttempts();
@@ -157,7 +163,6 @@ public class AuthService {
                     .build();
                     
         } catch (AuthenticationException e) {
-            User user = userRepository.findByLoginId(request.getLoginId()).orElse(null);
             if (user != null) {
                 user.incrementLoginAttempts();
                 userRepository.save(user);

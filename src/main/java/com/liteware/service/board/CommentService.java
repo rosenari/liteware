@@ -44,7 +44,7 @@ public class CommentService {
             Comment parentComment = commentRepository.findById(dto.getParentCommentId())
                     .orElseThrow(() -> new RuntimeException("부모 댓글을 찾을 수 없습니다"));
             
-            if (parentComment.getDepth() >= 2) {
+            if (parentComment.getDepth() >= 1) {
                 throw new RuntimeException("대댓글의 대댓글은 작성할 수 없습니다");
             }
             

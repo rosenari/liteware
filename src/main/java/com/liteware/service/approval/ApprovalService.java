@@ -168,7 +168,7 @@ public class ApprovalService {
                 .orElseThrow(() -> new RuntimeException("첫 번째 결재자를 찾을 수 없습니다"));
         
         document.setStatus(DocumentStatus.PENDING);
-        document.setDraftedAt(LocalDateTime.now());
+        // draftedAt은 @CreationTimestamp로 자동 설정되므로 제거
         document.setCurrentApprover(firstLine.getApprover());
         
         ApprovalDocument savedDocument = documentRepository.save(document);
