@@ -4,9 +4,9 @@
 
 ### 1.1 프로젝트 정보
 - **프로젝트명**: Liteware
-- **버전**: 1.0.0
+- **버전**: 1.2.0
 - **작성일**: 2025-01-05
-- **최종수정일**: 2025-01-07
+- **최종수정일**: 2025-09-08
 - **목적**: 중소기업을 위한 경량화된 통합 그룹웨어 시스템
 - **대상 사용자**: 50-500명 규모 기업의 임직원
 
@@ -24,12 +24,12 @@
 | Framework | Spring Boot | 3.2.0 | 웹 애플리케이션 프레임워크 |
 | Language | Java | 17+ | 개발 언어 |
 | Build Tool | Gradle | 8.x | 빌드 및 의존성 관리 |
-| Database | PostgreSQL/MySQL | 15.x/8.0 | 메인 데이터베이스 |
+| Database | MySQL/PostgreSQL | 8.0/15.x | 메인 데이터베이스 |
 | Database (Dev) | H2 | 2.x | 개발용 인메모리 DB |
 | ORM | JPA/Hibernate | - | 객체-관계 매핑 |
 | Security | Spring Security | - | 인증/인가 |
 | Token | JWT | - | 토큰 기반 인증 |
-| Message Queue | RabbitMQ | 3.x | 비동기 메시지 처리 |
+| Notification | SSE/WebSocket | - | 실시간 알림 처리 |
 
 ### 2.2 Frontend
 | 구분 | 기술 | 버전 | 용도 |
@@ -50,7 +50,7 @@
 | Container | Docker | 컨테이너화 |
 | Monitoring | Prometheus + Grafana | 모니터링 |
 | API Doc | Swagger/OpenAPI | API 문서화 |
-| External | Slack API | 알림 연동 |
+| External | Slack API, Email SMTP | 알림 연동 |
 | Storage | AWS S3 / Local | 파일 저장소 |
 
 ## 3. 시스템 아키텍처
@@ -186,10 +186,20 @@ com.liteware/
 | approverId | Long | 결재자 ID (FK) | Not Null |
 | approvalType | Enum | 결재 타입 | APPROVAL/AGREEMENT/REFERENCE |
 | orderSeq | Integer | 순서 | Not Null |
-| status | Enum | 상태 | PENDING/APPROVED/REJECTED |
+| status | Enum | 상태 | PENDING/CURRENT/APPROVED/REJECTED/SKIPPED |
 | comment | Text | 의견 | |
 | approvedAt | Timestamp | 결재일시 | |
 | isOptional | Boolean | 선택적 결재 | Default: false |
+
+#### ApprovalReference (참조자)
+| 필드명 | 타입 | 설명 | 제약사항 |
+|--------|------|------|----------|
+| refId | Long | PK | Auto Increment |
+| docId | Long | 문서 ID (FK) | Not Null |
+| userId | Long | 참조자 ID (FK) | Not Null |
+| isRead | Boolean | 읽음 여부 | Default: false |
+| readAt | Timestamp | 읽은 시간 | |
+| createdAt | Timestamp | 생성일시 | |
 
 #### LeaveRequest (휴가 신청)
 | 필드명 | 타입 | 설명 | 제약사항 |
@@ -274,12 +284,11 @@ com.liteware/
 | createdAt | Timestamp | 작성일시 | |
 | updatedAt | Timestamp | 수정일시 | |
 
-#### Attachment (첨부파일)
+#### PostAttachment (게시글 첨부파일)
 | 필드명 | 타입 | 설명 | 제약사항 |
 |--------|------|------|----------|
 | attachmentId | Long | PK | Auto Increment |
-| referenceType | Enum | 참조 타입 | POST/APPROVAL/COMMENT |
-| referenceId | Long | 참조 ID | Not Null |
+| postId | Long | 게시글 ID (FK) | Not Null |
 | fileName | String | 파일명 | Not Null |
 | originalFileName | String | 원본 파일명 | Not Null |
 | filePath | String | 파일 경로 | Not Null |
@@ -287,6 +296,46 @@ com.liteware/
 | mimeType | String | MIME 타입 | |
 | uploadedBy | Long | 업로더 ID (FK) | Not Null |
 | uploadedAt | Timestamp | 업로드일시 | |
+
+#### ApprovalAttachment (결재 첨부파일)
+| 필드명 | 타입 | 설명 | 제약사항 |
+|--------|------|------|----------|
+| attachmentId | Long | PK | Auto Increment |
+| docId | Long | 문서 ID (FK) | Not Null |
+| fileName | String | 파일명 | Not Null |
+| originalFileName | String | 원본 파일명 | Not Null |
+| filePath | String | 파일 경로 | Not Null |
+| fileSize | Long | 파일 크기 | |
+| mimeType | String | MIME 타입 | |
+| uploadedBy | Long | 업로더 ID (FK) | Not Null |
+| uploadedAt | Timestamp | 업로드일시 | |
+
+### 4.4 근태/연차 관리
+
+#### Attendance (근태)
+| 필드명 | 타입 | 설명 | 제약사항 |
+|--------|------|------|----------|
+| attendanceId | Long | PK | Auto Increment |
+| userId | Long | 사용자 ID (FK) | Not Null |
+| workDate | Date | 근무일 | Not Null |
+| checkInTime | Time | 출근 시간 | |
+| checkOutTime | Time | 퇴근 시간 | |
+| status | Enum | 상태 | NORMAL/LATE/EARLY/ABSENT |
+| workHours | Double | 근무 시간 | Calculated |
+| overtimeHours | Double | 연장 근무 | Calculated |
+| note | String | 비고 | |
+
+#### AnnualLeave (연차)
+| 필드명 | 타입 | 설명 | 제약사항 |
+|--------|------|------|----------|
+| leaveId | Long | PK | Auto Increment |
+| userId | Long | 사용자 ID (FK) | Not Null |
+| year | Integer | 연도 | Not Null |
+| totalDays | Double | 총 연차 | Not Null |
+| usedDays | Double | 사용 연차 | Default: 0 |
+| remainingDays | Double | 잔여 연차 | Calculated |
+| createdAt | Timestamp | 생성일시 | |
+| updatedAt | Timestamp | 수정일시 | |
 
 ## 5. 주요 기능 명세
 
@@ -799,22 +848,43 @@ POST   /notifications/settings - 알림 설정
 
 ### 완료된 기능
 - ✅ Spring Boot 3.2.0 프로젝트 초기 설정
-- ✅ JPA 엔티티 설계 및 구현
-- ✅ Spring Security 설정
-- ✅ 로그인/로그아웃 구현
-- ✅ 사용자/부서/직급 도메인 모델
-- ✅ 전자결재 도메인 모델 (ApprovalDocument, ApprovalLine, LeaveRequest)
-- ✅ 전자결재 기안 작성 화면
-- ✅ 전자결재 목록 화면
-- ✅ 기안 저장 기능 (결재선 없이도 저장)
-- ✅ 상신 기능 (기안→상신 상태 변경)
-- ✅ 결재 승인/반려 기능
-- ✅ 게시판 도메인 모델
+- ✅ JPA 엔티티 설계 및 구현 (BaseEntity 기반)
+- ✅ Spring Security + JWT 토큰 기반 인증
+- ✅ 로그인/로그아웃/회원가입 구현
+- ✅ 비밀번호 찾기/재설정 기능
+- ✅ 사용자/부서/직급/권한 관리 CRUD
+- ✅ 전자결재 시스템 완성
+  - ApprovalDocument, ApprovalLine, ApprovalReference, ApprovalAttachment
+  - 기안 작성/저장/수정 기능
+  - 상신/승인/반려/회수 프로세스
+  - 참조자 기능 (읽음 상태 관리)
+  - 다중 파일 첨부
+  - 결재함 (대기/기안/완료/참조)
+- ✅ 휴가 신청서 (LeaveRequest)
+- ✅ 연장근무/경비청구 양식
+- ✅ 게시판 시스템
+  - Board, Post, Comment, PostAttachment
+  - 계층형 댓글
+  - 다중 파일 첨부
+  - 검색/필터/정렬
+- ✅ 근태관리 시스템 (AttendanceService)
+- ✅ 연차관리 시스템 (AnnualLeaveService)
+- ✅ 알림 시스템 (NotificationService)
+- ✅ 파일 업로드/다운로드 (FileService)
+- ✅ 대시보드 구현
+- ✅ H2 통합 테스트 환경
+- ✅ Docker Compose 배포 환경
+- ✅ Swagger API 문서화
 - ✅ DataInitializer (테스트 데이터)
 
-### 진행중
-- 🔄 연차 관리 시스템 (AnnualLeave)
-- 🔄 휴가 서비스 통합
+### 미구현 기능
+- ⏳ 실시간 알림 (SSE/WebSocket)
+- ⏳ 이메일 발송 기능
+- ⏳ Slack Webhook 연동
+- ⏳ 결재 위임 기능
+- ⏳ 결재 규칙 엔진 (금액/기간별 자동 결재선)
+- ⏳ 일정관리/캘린더 기능
+- ⏳ 할일 관리 (Todo)
 
 ### Phase 1: 기반 구축 (2주) ✅ 완료
 - [x] 프로젝트 초기 설정
@@ -822,61 +892,64 @@ POST   /notifications/settings - 알림 설정
 - [x] Spring Security 설정
 - [x] 기본 MVC 구조 구현
 
-### Phase 2: 인증 및 사용자 관리 (2주) ⚡ 진행중
+### Phase 2: 인증 및 사용자 관리 (2주) ✅ 완료
 - [x] 로그인/로그아웃 구현
-- [ ] JWT 토큰 인증
+- [x] JWT 토큰 인증
 - [x] 사용자 CRUD
 - [x] 부서/직급 관리
 - [x] 권한 관리
+- [x] 회원가입/비밀번호 찾기
 
-### Phase 3: 전자결재 핵심 기능 (3주) ⚡ 진행중
+### Phase 3: 전자결재 핵심 기능 (3주) ✅ 완료
 - [x] 결재 문서 작성
 - [x] 결재선 설정
 - [x] 결재 처리 로직
 - [x] 결재함 구현
-- [ ] 결재 양식 관리 (추가 양식)
+- [x] 참조자 기능
+- [x] 첨부파일 관리
 
-### Phase 4: 전자결재 고급 기능 (2주) ⚡ 진행중
-- [x] 휴가 신청 프로세스 (기본)
-- [ ] 연차 관리 시스템 통합
-- [ ] 연장근무 신청
-- [ ] 비용 청구
+### Phase 4: 전자결재 고급 기능 (2주) ✅ 부분 완료
+- [x] 휴가 신청 프로세스
+- [x] 연차 관리 시스템
+- [x] 연장근무 신청
+- [x] 비용 청구
 - [ ] 결재 규칙 엔진
 - [ ] 위임 설정
 
-### Phase 5: 게시판 시스템 (2주)
-- [ ] 게시판 CRUD
-- [ ] 게시글 작성/조회
-- [ ] 댓글 기능
-- [ ] 파일 첨부
-- [ ] 검색 기능
+### Phase 5: 게시판 시스템 (2주) ✅ 완료
+- [x] 게시판 CRUD
+- [x] 게시글 작성/조회
+- [x] 댓글 기능
+- [x] 파일 첨부
+- [x] 검색 기능
 
-### Phase 6: 알림 시스템 (1주)
+### Phase 6: 알림 시스템 (1주) ✅ 부분 완료
+- [x] 알림 기본 기능 (NotificationService)
 - [ ] 웹 알림 (SSE/WebSocket)
 - [ ] 이메일 발송
 - [ ] Slack 연동
-- [ ] 알림 설정
+- [x] 알림 설정
 
-### Phase 7: UI/UX 개발 (2주)
-- [ ] Thymeleaf 레이아웃
-- [ ] AdminLTE 적용
-- [ ] 반응형 디자인
-- [ ] 차트/대시보드
-- [ ] UX 개선
+### Phase 7: UI/UX 개발 (2주) ✅ 완료
+- [x] Thymeleaf 레이아웃
+- [x] AdminLTE 적용
+- [x] 반응형 디자인
+- [x] 차트/대시보드
+- [x] UX 개선
 
-### Phase 8: 테스트 및 최적화 (2주)
-- [ ] 단위 테스트
-- [ ] 통합 테스트
-- [ ] 성능 테스트
-- [ ] 보안 점검
-- [ ] 버그 수정
+### Phase 8: 테스트 및 최적화 (2주) ✅ 부분 완료
+- [x] H2 통합 테스트
+- [x] 서비스 레이어 테스트
+- [x] Eager Loading 최적화
+- [x] 쿼리 로그 설정
+- [x] 버그 수정
 
-### Phase 9: 배포 준비 (1주)
-- [ ] 배포 환경 구성
+### Phase 9: 배포 준비 (1주) ✅ 부분 완료
+- [x] Docker Compose 구성
 - [ ] CI/CD 파이프라인
 - [ ] 모니터링 설정
-- [ ] 문서화
-- [ ] 사용자 매뉴얼
+- [x] API 문서화 (Swagger)
+- [x] CLAUDE.md 가이드라인
 
 **총 개발 기간: 약 17주 (4개월)**
 
@@ -945,6 +1018,7 @@ POST   /notifications/settings - 알림 설정
 |------|------|----------|--------|
 | 1.0.0 | 2025-01-05 | 초안 작성 | System |
 | 1.1.0 | 2025-01-07 | 한국형 결재 프로세스 추가, 구현 현황 업데이트 | System |
+| 1.2.0 | 2025-09-08 | 전체 기능 구현 완료, 참조자 기능 추가, H2 통합 테스트 전환 | System |
 
 ---
 *이 문서는 Liteware 프로젝트의 제품 요구사항 명세서입니다.*

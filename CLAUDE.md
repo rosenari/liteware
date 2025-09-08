@@ -2,9 +2,34 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Development Principles
+
+### 1. 최소 수정의 원칙 (Principle of Minimal Modification)
+- 기존 코드를 수정할 때는 필요한 최소한의 변경만 수행
+- 동작하는 코드는 리팩토링이 명확히 필요한 경우가 아니면 유지
+- 새로운 기능 추가 시 기존 구조를 최대한 활용
+
+### 2. 간결함의 원칙 (Principle of Simplicity)
+- 복잡한 로직보다 단순하고 읽기 쉬운 코드 선호
+- 과도한 추상화 지양
+- 명확한 네이밍과 직관적인 구조 유지
+
+### 3. 유지보수 우선 설계 (Maintainability First)
+- 여러 구현 방법 중 가장 유지보수가 용이한 방식 선택
+- 코드 가독성을 성능보다 우선시 (성능이 critical하지 않은 경우)
+- 일관된 코딩 스타일과 패턴 유지
+
+### 4. JPA Fetch 전략
+- N+1 문제를 사전에 방지하기 위해 연관관계는 가능한 EAGER로 설정
+- 순환 참조가 없고 데이터 크기가 크지 않은 경우 EAGER 적용
+- 현재 적용 예시:
+  - ApprovalDocument의 approvalLines, attachments, references: EAGER
+  - Board, Post의 기본 연관관계: EAGER
+- Lazy Loading 예외를 최소화하여 안정적인 서비스 운영
+
 ## Project Overview
 
-Liteware는 Spring Boot 3.2.0 기반 그룹웨어 시스템으로, 전자결재, 게시판, 조직관리 등의 기능을 제공합니다. TDD 방식으로 개발되었으며 Docker로 배포 가능합니다.
+Liteware는 Spring Boot 3.2.0 기반 그룹웨어 시스템으로, 전자결재, 게시판, 조직관리, 근태관리, 연차관리 등의 기능을 제공합니다. H2 통합 테스트 기반으로 개발되었으며 Docker로 배포 가능합니다.
 
 ## Development Commands
 
@@ -26,7 +51,7 @@ Liteware는 Spring Boot 3.2.0 기반 그룹웨어 시스템으로, 전자결재,
 ./gradlew test
 
 # 특정 테스트 클래스 실행
-./gradlew test --tests "com.liteware.service.AuthServiceTest"
+./gradlew test --tests "com.liteware.service.approval.ApprovalServiceTest"
 
 # 특정 패키지 테스트 실행
 ./gradlew test --tests "com.liteware.service.*"
@@ -76,15 +101,30 @@ docker-compose down -v
 ### Core Domains
 
 #### Approval System (전자결재)
-- **Entities**: `ApprovalDocument`, `ApprovalLine`, `ApprovalAttachment`
-- **Document Types**: `LeaveRequest`, `OvertimeRequest`, `ExpenseRequest`
-- **Workflow**: 순차적 결재선 처리, 상태 관리 (DRAFT → PENDING → APPROVED/REJECTED)
-- **Service**: `ApprovalService`, `ApprovalWorkflowService`
+- **Entities**: `ApprovalDocument`, `ApprovalLine`, `ApprovalAttachment`, `ApprovalReference`
+- **Document Types**: `LeaveRequest` (휴가신청), `OvertimeRequest` (연장근무), `ExpenseRequest` (지출결의)
+- **Workflow States**: 
+  - DRAFT (임시저장) → PENDING (결재대기) → APPROVED (승인) / REJECTED (반려)
+  - CANCELLED (취소 가능)
+- **Services**: 
+  - `ApprovalService`: 문서 CRUD, 첨부파일 관리, 참조자 관리
+  - `ApprovalWorkflowService`: 결재 프로세스, 상태 전이, 알림 처리
+- **Features**:
+  - 순차/병렬 결재선 지원
+  - 참조자 기능 (읽음 상태 관리)
+  - 파일 첨부 (다중 파일 지원)
+  - 긴급 문서 처리
 
 #### Board System (게시판)
 - **Entities**: `Board`, `Post`, `Comment`, `PostAttachment`
-- **Features**: 다중 게시판, 댓글, 파일 첨부
-- **Service**: `BoardService`, `CommentService`
+- **Board Types**: NOTICE (공지사항), FREE (자유게시판), QNA (Q&A), FAQ
+- **Features**: 
+  - 다중 게시판 지원
+  - 계층형 댓글
+  - 파일 첨부 (이미지, 문서)
+  - 조회수 관리
+  - 검색 기능 (제목, 내용, 작성자)
+- **Services**: `BoardService`, `CommentService`
 
 #### Authentication & Security
 - **JWT 기반 인증**: `JwtTokenProvider`, `JwtAuthenticationFilter`
@@ -92,8 +132,36 @@ docker-compose down -v
 - **CustomUserDetails**: 사용자 정보 및 권한 관리
 
 #### Organization (조직관리)
-- **Entities**: `Department` (계층구조), `Position`, `User`
-- **Relationships**: User-Department-Position 매핑
+- **Entities**: 
+  - `Department`: 계층형 부서 구조 (parentDepartment)
+  - `Position`: 직급 관리 (level 기반)
+  - `User`: 사용자 정보
+  - `Role`: 권한 관리 (ADMIN, USER, MANAGER)
+- **Relationships**: 
+  - User ↔ Department (N:1)
+  - User ↔ Position (N:1)
+  - User ↔ Role (N:N)
+- **Services**: `DepartmentService`, `PositionService`, `UserService`
+
+#### Attendance & Leave (근태/연차관리)
+- **Entities**: 
+  - `Attendance`: 출퇴근 기록
+  - `AnnualLeave`: 연차 관리
+- **Features**:
+  - 출퇴근 체크
+  - 근무시간 계산
+  - 연차 잔여일수 관리
+  - 연차 사용 내역
+- **Services**: `AttendanceService`, `AnnualLeaveService`
+
+#### Notification (알림)
+- **Entity**: `Notification`
+- **Types**: 결재 요청, 결재 완료, 댓글 알림, 시스템 공지
+- **Features**: 
+  - 실시간 알림
+  - 읽음 상태 관리
+  - 알림 보관 기간 설정
+- **Service**: `NotificationService`
 
 ### Key Technical Patterns
 
@@ -136,10 +204,17 @@ public class XxxService {
 
 ### Test Strategy
 
-#### Unit Testing
-- 모든 Service 클래스에 대한 단위 테스트
-- Mockito를 사용한 의존성 모킹
-- 비즈니스 로직 검증 중심
+#### Integration Testing with H2
+- **모든 Service 테스트를 H2 기반 통합 테스트로 구현**
+- `BaseServiceTest` 상속을 통한 공통 테스트 환경 제공
+- 실제 데이터베이스 트랜잭션 및 영속성 검증
+- `@Transactional` 및 `@Rollback`으로 테스트 격리
+
+#### Test Data Setup
+- `BaseServiceTest`에서 공통 테스트 데이터 초기화
+  - 부서, 직급, 권한 기본 데이터
+  - 테스트용 사용자 생성 헬퍼 메서드
+- 각 도메인별 테스트 데이터 구성
 
 #### Test Naming Convention
 ```java
@@ -165,20 +240,55 @@ void createUser_DuplicateEmail_ThrowsException() { }
 
 #### CORS Settings
 - 허용 Origin: `http://localhost:3000`, `http://localhost:8080`
+- 허용 메서드: GET, POST, PUT, DELETE, OPTIONS
 - Credentials 허용: true
 
 ### API Documentation
 - Swagger UI: `http://localhost:8080/swagger-ui.html`
 - API Docs: `http://localhost:8080/api-docs`
 
+### Key API Endpoints
+
+#### Authentication
+- POST `/api/auth/login` - 로그인
+- POST `/api/auth/signup` - 회원가입
+- POST `/api/auth/refresh` - 토큰 갱신
+
+#### Approval
+- GET `/api/approval/documents` - 문서 목록
+- POST `/api/approval/documents` - 문서 작성
+- PUT `/api/approval/documents/{id}` - 문서 수정
+- POST `/api/approval/documents/{id}/submit` - 결재 상신
+- POST `/api/approval/documents/{id}/approve` - 승인
+- POST `/api/approval/documents/{id}/reject` - 반려
+
+#### Board
+- GET `/api/boards` - 게시판 목록
+- GET `/api/boards/{boardId}/posts` - 게시글 목록
+- POST `/api/boards/{boardId}/posts` - 게시글 작성
+- GET `/api/posts/{postId}` - 게시글 상세
+- POST `/api/posts/{postId}/comments` - 댓글 작성
+
 ### Development Environment Setup Requirements
 1. Java 17+
 2. MySQL 8.0 (프로덕션) 또는 H2 (개발)
-3. Gradle 8.5
+3. Gradle 8.5+
+4. Docker & Docker Compose (선택사항)
 
 ### Common Troubleshooting
 
 #### Test Failures
 - H2 데이터베이스 설정 확인 (`application-test.yml`)
-- Mock 객체 주입 확인
+- `BaseServiceTest` 상속 여부 확인
 - 트랜잭션 롤백 설정 확인
+- 테스트 데이터 초기화 순서 확인
+
+#### Application Startup Issues
+- H2 Console 접속: `http://localhost:8080/h2-console`
+- JDBC URL: `jdbc:h2:mem:testdb`
+- 로그 레벨 조정: `application.yml`의 `logging.level`
+
+#### Docker Issues
+- MySQL 컨테이너 헬스체크 확인
+- 네트워크 설정 확인
+- 볼륨 권한 문제 해결
